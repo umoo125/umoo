@@ -45,6 +45,9 @@
 
         .btn-primary { background-color: var(--logo-red); color: white; transition: all 0.3s ease; }
         .btn-primary:hover { background-color: #61131b; transform: translateY(-2px); }
+
+        .btn-secondary { background-color: var(--logo-green); color: white; transition: all 0.3s ease; }
+        .btn-secondary:hover { background-color: #0d1a13; transform: translateY(-2px); }
         
         .accent-border { border-color: var(--logo-yellow); }
 
@@ -220,7 +223,11 @@
             <a href="#vision" class="hover:text-[#801A24] transition-colors">農場願景</a>
             <a href="#themes" class="hover:text-[#801A24] transition-colors">主題體驗</a>
             <a href="#location" class="hover:text-[#801A24] transition-colors">交通位置</a>
-            <button onclick="toggleBooking(true)" class="btn-primary px-5 py-2 rounded-xl shadow-md text-sm">立即預約</button>
+            <div class="flex gap-2">
+                <!-- 更新後的採購按鈕：直接連結 -->
+                <a href="http://yumzi.app/zh-TW/you-mu-125?source=qr" target="_blank" class="btn-secondary px-5 py-2 rounded-xl shadow-md text-sm flex items-center justify-center">手作商品</a>
+                <button onclick="toggleBooking(true)" class="btn-primary px-5 py-2 rounded-xl shadow-md text-sm">立即預約</button>
+            </div>
         </div>
     </nav>
 
@@ -230,9 +237,15 @@
             <span class="inline-block px-4 py-1 border border-white/50 rounded-full text-sm tracking-[0.3em] mb-6 uppercase">Est. 2026 有木125</span>
             <h1 class="serif text-5xl md:text-8xl mb-6">讓自然成為生活的一部分</h1>
             <p class="text-lg md:text-2xl font-light mb-12 opacity-90 tracking-widest">動物陪你玩、植物陪你療癒、手作讓你把溫度帶回家</p>
-            <button onclick="toggleBooking(true)" class="bg-[#B1A21E] text-white px-12 py-4 rounded-2xl font-bold hover:scale-105 transition-all shadow-lg flex items-center mx-auto w-fit">
-                立即預約體驗
-            </button>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button onclick="toggleBooking(true)" class="bg-[#B1A21E] text-white px-10 py-4 rounded-2xl font-bold hover:scale-105 transition-all shadow-lg flex items-center gap-2">
+                    <i data-lucide="calendar"></i> 立即預約體驗
+                </button>
+                <!-- 更新後的採購按鈕：直接連結 -->
+                <a href="http://yumzi.app/zh-TW/you-mu-125?source=qr" target="_blank" class="bg-[#1A3024] text-white px-10 py-4 rounded-2xl font-bold hover:scale-105 transition-all shadow-lg flex items-center gap-2">
+                    <i data-lucide="shopping-bag"></i> 手作商品採購
+                </a>
+            </div>
         </div>
     </header>
 
@@ -266,10 +279,14 @@
                     <p class="text-gray-600 leading-loose italic">
                         「我們不只是土地的擁有者，而是土地的守護者。」
                     </p>
-                    <div class="pt-4">
+                    <div class="pt-4 flex gap-6">
                         <button onclick="toggleBooking(true)" class="flex items-center gap-2 text-[#1A3024] font-bold border-b-2 border-[#B1A21E] pb-1 hover:text-[#801A24] transition-colors">
-                            加入我們的生態旅程 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            預約旅程 <i data-lucide="arrow-right" class="w-4 h-4"></i>
                         </button>
+                        <!-- 願景區塊按鈕也更新 -->
+                        <a href="http://yumzi.app/zh-TW/you-mu-125?source=qr" target="_blank" class="flex items-center gap-2 text-[#1A3024] font-bold border-b-2 border-[#1A3024] pb-1 hover:text-[#B1A21E] transition-colors">
+                            瀏覽商品 <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -713,6 +730,19 @@
 
         function toggleBooking(show) {
             const modal = document.getElementById('bookingModal');
+            if (show) {
+                modal.style.display = 'block';
+                setTimeout(() => modal.classList.add('active'), 10);
+                document.body.style.overflow = 'hidden';
+            } else {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 500);
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function toggleShop(show) {
+            const modal = document.getElementById('shopModal');
             if (show) {
                 modal.style.display = 'block';
                 setTimeout(() => modal.classList.add('active'), 10);
