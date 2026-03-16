@@ -724,9 +724,7 @@
     </footer>
 
     <!-- 背景音樂元素與控制按鈕 -->
-    <audio id="bgMusic" loop>
-        <source src="umoo125.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bgMusic" loop preload="auto"></audio>
     <button id="musicToggle" onclick="toggleMusic()"
         style="position:fixed; bottom:30px; right:30px; z-index:2000; width:50px; height:50px; border-radius:50%; border:none; background:#d8c3a5; font-size:24px; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.3); transition:0.3s; display:flex; align-items:center; justify-content:center;">
         🎵
@@ -893,6 +891,40 @@
         // 音樂控制相關常數與狀態
         const bgMusic = document.getElementById("bgMusic");
         let isMusicPlaying = false;
+
+        // 根據日期與時間決定背景音樂來源
+        function setupMusicSource() {
+            const now = new Date();
+            const day = now.getDay(); // 0: 週日, 1-5: 平日, 6: 週六
+            const hour = now.getHours(); // 0-23
+
+            // 是否為週末 (週六、週日)
+            const isWeekend = (day === 0 || day === 6);
+            // 是否為晚上 (下午 6:00 之後)
+            const isNight = (hour >= 18);
+
+            if (isWeekend) {
+                if (isNight) {
+                    // 週末晚上
+                    bgMusic.src = "umoo125_night.mp3"; // 週末晚上的曲目 有木之歌
+                } else {
+                    // 週末白天
+                    bgMusic.src = "umoo125_day.mp3"; // 週末白天的曲目 有木歡迎歌
+                }
+            } else {
+                if (isNight) {
+                    // 平日晚上
+                    bgMusic.src = "umoo125_night.mp3"; // 平日晚上播放的曲目 有木之歌
+                } else {
+                    // 平日白天
+                    bgMusic.src = "umoo125.mp3"; // 預設的平日白天曲目
+                }
+            }
+            bgMusic.load();
+        }
+
+        // 初始化音樂設定
+        setupMusicSource();
 
         function toggleMusic() {
             if (isMusicPlaying) {
