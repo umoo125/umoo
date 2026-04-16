@@ -1,654 +1,850 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>🪿 鵝鵝吃高麗菜 2048</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>🪿 鵝鵝吃高麗菜 2048</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap');
 
-:root {
-  --bg: #e8f5e1;
-  --board: #8bc34a;
-  --cell-empty: rgba(139,195,74,0.35);
-  --shadow: rgba(60,100,20,0.18);
-  --white: #fffef8;
-  --text: #2e4a1a;
-  --accent: #f57f17;
-}
+    :root {
+      --bg: #e8f5e1;
+      --board: #8bc34a;
+      --cell-empty: rgba(139, 195, 74, 0.35);
+      --shadow: rgba(60, 100, 20, 0.18);
+      --white: #fffef8;
+      --text: #2e4a1a;
+      --accent: #f57f17;
+    }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-body {
-  font-family: 'Nunito', sans-serif;
-  background: var(--bg);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-  touch-action: none;
-  user-select: none;
-  position: relative;
-}
+    html,
+    body {
+      height: 100%;
+    }
 
-/* Soft background texture */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 20% 20%, #d4edba 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, #fff9c4 0%, transparent 50%),
-    radial-gradient(ellipse at 60% 10%, #c8e6c9 0%, transparent 40%);
-  pointer-events: none;
-  z-index: 0;
-}
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      position: relative;
+    }
 
-/* Floating leaves */
-.leaf {
-  position: fixed;
-  font-size: 1.4rem;
-  opacity: 0.18;
-  pointer-events: none;
-  z-index: 0;
-  animation: floatLeaf linear infinite;
-}
-@keyframes floatLeaf {
-  0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-  10%  { opacity: 0.18; }
-  90%  { opacity: 0.18; }
-  100% { transform: translateY(-120px) rotate(360deg); opacity: 0; }
-}
+    /* Soft background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 20%, #d4edba 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, #fff9c4 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 10%, #c8e6c9 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-/* Header */
-.header {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px 4px;
-  max-width: 420px;
-}
-.title-block { display: flex; flex-direction: column; }
-.title {
-  font-family: 'Fredoka One', cursive;
-  font-size: clamp(1.6rem, 6vw, 2.2rem);
-  color: var(--text);
-  line-height: 1;
-  letter-spacing: 1px;
-  text-shadow: 0 2px 6px rgba(60,100,20,.12);
-}
-.subtitle {
-  font-size: clamp(0.65rem, 2.5vw, 0.8rem);
-  color: #5a8a2a;
-  font-weight: 800;
-  margin-top: 1px;
-}
+    /* Floating leaves */
+    .leaf {
+      position: fixed;
+      font-size: 1.4rem;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+      animation: floatLeaf linear infinite;
+    }
 
-/* Score pills */
-.score-group { display: flex; gap: 8px; align-items: center; }
-.score-pill {
-  background: var(--board);
-  border-radius: 14px;
-  padding: 5px 14px;
-  text-align: center;
-  min-width: 64px;
-  box-shadow: 0 3px 0 #6a9e30, 0 4px 12px var(--shadow);
-}
-.score-pill .slabel {
-  font-size: 0.55rem;
-  color: #d4f5a0;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.score-pill .sval {
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.3rem;
-  color: #fff;
-  line-height: 1.1;
-}
+    @keyframes floatLeaf {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
 
-/* New game btn */
-.new-btn {
-  background: var(--accent);
-  color: #fff;
-  font-family: 'Fredoka One', cursive;
-  font-size: 0.9rem;
-  border: none;
-  border-radius: 12px;
-  padding: 8px 14px;
-  cursor: pointer;
-  box-shadow: 0 3px 0 #c85000, 0 4px 12px rgba(200,80,0,.25);
-  transition: transform .1s, box-shadow .1s;
-  letter-spacing: .5px;
-  white-space: nowrap;
-}
-.new-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #c85000, 0 2px 6px rgba(200,80,0,.2); }
+      10% {
+        opacity: 0.18;
+      }
 
-/* Hint bar */
-.hint {
-  position: relative;
-  z-index: 10;
-  font-size: clamp(0.7rem, 2.5vw, 0.82rem);
-  color: #6a9e30;
-  font-weight: 800;
-  padding: 2px 16px 6px;
-  text-align: center;
-}
+      90% {
+        opacity: 0.18;
+      }
 
-/* Board */
-.board-wrap {
-  position: relative;
-  z-index: 10;
-  width: min(92vw, 400px);
-  padding: clamp(8px, 2.5vw, 14px);
-  background: var(--board);
-  border-radius: 20px;
-  box-shadow: 0 6px 0 #6a9e30, 0 10px 30px var(--shadow);
-}
+      100% {
+        transform: translateY(-120px) rotate(360deg);
+        opacity: 0;
+      }
+    }
 
-.grid-bg {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(6px, 2vw, 10px);
-}
-.cell-bg {
-  aspect-ratio: 1;
-  border-radius: 12px;
-  background: var(--cell-empty);
-}
+    /* Header */
+    .header {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px 4px;
+      max-width: 420px;
+    }
 
-/* Tiles layer */
-.tiles-layer {
-  position: absolute;
-  inset: clamp(8px, 2.5vw, 14px);
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(6px, 2vw, 10px);
-  pointer-events: none;
-}
+    .title-block {
+      display: flex;
+      flex-direction: column;
+    }
 
-.tile {
-  aspect-ratio: 1;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Fredoka One', cursive;
-  transition: transform 0.1s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 3px 8px rgba(0,0,0,.15);
-}
+    .title {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(1.6rem, 6vw, 2.2rem);
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 6px rgba(60, 100, 20, .12);
+    }
 
-/* Tile themes */
-.tile[data-v="1"]    { background: #f9fbe7; }
-.tile[data-v="2"]    { background: #f1f8e9; }
-.tile[data-v="4"]    { background: #dcedc8; }
-.tile[data-v="8"]    { background: #c5e1a5; }
-.tile[data-v="16"]   { background: #aed581; }
-.tile[data-v="32"]   { background: #8bc34a; }
-.tile[data-v="64"]   { background: #7cb342; }
-.tile[data-v="128"]  { background: #558b2f; }
-.tile[data-v="256"]  { background: #f9a825; }
-.tile[data-v="512"]  { background: #f57f17; }
-.tile[data-v="1024"] { background: #e65100; }
-.tile[data-v="2048"] { background: #b71c1c; }
+    .subtitle {
+      font-size: clamp(0.65rem, 2.5vw, 0.8rem);
+      color: #5a8a2a;
+      font-weight: 800;
+      margin-top: 1px;
+    }
 
-.tile-emoji {
-  font-size: clamp(1.4rem, 5vw, 2.2rem);
-  line-height: 1;
-  filter: drop-shadow(0 1px 3px rgba(0,0,0,.15));
-}
-.tile-num {
-  font-size: clamp(0.6rem, 2vw, 0.85rem);
-  color: #2e4a1a;
-  opacity: 0.7;
-  margin-top: 1px;
-  letter-spacing: .5px;
-}
-.tile[data-v="128"] .tile-num,
-.tile[data-v="256"] .tile-num,
-.tile[data-v="512"] .tile-num,
-.tile[data-v="1024"] .tile-num,
-.tile[data-v="2048"] .tile-num { color: #fff; }
+    /* Score pills */
+    .score-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
 
-/* Tile animations */
-@keyframes tileAppear {
-  0%   { transform: scale(0.3); opacity: 0; }
-  70%  { transform: scale(1.12); }
-  100% { transform: scale(1);   opacity: 1; }
-}
-@keyframes tileMerge {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.22); }
-  100% { transform: scale(1); }
-}
-.tile.new    { animation: tileAppear .22s cubic-bezier(.17,.67,.35,1.4) forwards; }
-.tile.merged { animation: tileMerge  .2s  cubic-bezier(.17,.67,.35,1.4) forwards; }
+    .score-pill {
+      background: var(--board);
+      border-radius: 14px;
+      padding: 5px 14px;
+      text-align: center;
+      min-width: 64px;
+      box-shadow: 0 3px 0 #6a9e30, 0 4px 12px var(--shadow);
+    }
 
-/* Score pop */
-.score-pop {
-  position: fixed;
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.4rem;
-  color: var(--accent);
-  text-shadow: 0 2px 6px rgba(0,0,0,.25);
-  pointer-events: none;
-  z-index: 300;
-  animation: scorePop .7s ease forwards;
-}
-@keyframes scorePop {
-  0%   { transform: translateY(0) scale(.8);  opacity: 1; }
-  60%  { transform: translateY(-36px) scale(1.2); opacity: 1; }
-  100% { transform: translateY(-60px) scale(1);   opacity: 0; }
-}
+    .score-pill .slabel {
+      font-size: 0.55rem;
+      color: #d4f5a0;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-/* D-pad */
-.dpad {
-  position: relative;
-  z-index: 10;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 6px;
-  width: min(160px, 42vw);
-  height: min(160px, 42vw);
-  margin: 10px auto 6px;
-}
-.dp {
-  background: rgba(255,255,255,.72);
-  border-radius: 14px;
-  border: none;
-  font-size: clamp(1.1rem, 4vw, 1.5rem);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 0 rgba(0,0,0,.14), 0 2px 8px rgba(0,0,0,.1);
-  transition: transform .08s, box-shadow .08s;
-  -webkit-tap-highlight-color: transparent;
-}
-.dp:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.14); }
-.dp.center { background: rgba(139,195,74,.3); pointer-events: none; font-size: 1.1rem; }
-.dp.empty  { background: transparent; box-shadow: none; pointer-events: none; }
+    .score-pill .sval {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      color: #fff;
+      line-height: 1.1;
+    }
 
-/* Overlays */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(20,40,10,.5);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  padding: 20px;
-}
-.overlay.hidden { display: none; }
-.card {
-  background: linear-gradient(150deg, #fffef0, #f1ffe4);
-  border-radius: 28px;
-  padding: clamp(22px,6vw,38px);
-  text-align: center;
-  width: min(320px, 90vw);
-  box-shadow: 0 20px 60px rgba(0,0,0,.28), 0 0 0 2.5px #8bc34a;
-  animation: cardIn .3s cubic-bezier(.17,.67,.35,1.4);
-}
-@keyframes cardIn {
-  from { transform: scale(.7) translateY(20px); opacity: 0; }
-  to   { transform: scale(1) translateY(0); opacity: 1; }
-}
-.card-icon  { font-size: clamp(3rem,10vw,4.5rem); margin-bottom: 6px; }
-.card-title { font-family: 'Fredoka One', cursive; font-size: clamp(1.4rem,5vw,2rem); color: var(--text); margin-bottom: 6px; }
-.card-body  { font-size: clamp(.8rem,3vw,.95rem); color: #555; line-height: 1.6; }
-.card-score { font-family: 'Fredoka One', cursive; font-size: clamp(1.8rem,6vw,2.6rem); color: var(--accent); margin: 10px 0 4px; }
-.card-best  { font-size: .82rem; color: #888; font-weight: 800; }
+    /* New game btn */
+    .new-btn {
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Fredoka One', cursive;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 12px;
+      padding: 8px 14px;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #c85000, 0 4px 12px rgba(200, 80, 0, .25);
+      transition: transform .1s, box-shadow .1s;
+      letter-spacing: .5px;
+      white-space: nowrap;
+    }
 
-.big-btn {
-  display: inline-block;
-  background: linear-gradient(135deg, #8bc34a, #558b2f);
-  color: #fff;
-  font-family: 'Fredoka One', cursive;
-  font-size: clamp(1rem,4vw,1.2rem);
-  padding: 13px 34px;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  margin-top: 14px;
-  box-shadow: 0 5px 0 #3a6e18, 0 8px 20px rgba(0,0,0,.2);
-  letter-spacing: .5px;
-  transition: transform .1s, box-shadow .1s;
-}
-.big-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #3a6e18, 0 4px 10px rgba(0,0,0,.15); }
+    .new-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #c85000, 0 2px 6px rgba(200, 80, 0, .2);
+    }
 
-/* Level map at the top of tile */
-.tile-badge {
-  position: absolute;
-  top: 3px; right: 5px;
-  font-size: 0.55rem;
-  font-weight: 900;
-  color: rgba(0,0,0,.3);
-  font-family: 'Nunito', sans-serif;
-}
-</style>
+    /* Hint bar */
+    .hint {
+      position: relative;
+      z-index: 10;
+      font-size: clamp(0.7rem, 2.5vw, 0.82rem);
+      color: #6a9e30;
+      font-weight: 800;
+      padding: 2px 16px 6px;
+      text-align: center;
+    }
+
+    /* Board */
+    .board-wrap {
+      position: relative;
+      z-index: 10;
+      width: min(92vw, 400px);
+      padding: clamp(8px, 2.5vw, 14px);
+      background: var(--board);
+      border-radius: 20px;
+      box-shadow: 0 6px 0 #6a9e30, 0 10px 30px var(--shadow);
+    }
+
+    .grid-bg {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(6px, 2vw, 10px);
+    }
+
+    .cell-bg {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      background: var(--cell-empty);
+    }
+
+    /* Tiles layer */
+    .tiles-layer {
+      position: absolute;
+      inset: clamp(8px, 2.5vw, 14px);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(6px, 2vw, 10px);
+      pointer-events: none;
+    }
+
+    .tile {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fredoka One', cursive;
+      transition: transform 0.1s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, .15);
+    }
+
+    /* Tile themes */
+    .tile[data-v="1"] {
+      background: #f9fbe7;
+    }
+
+    .tile[data-v="2"] {
+      background: #f1f8e9;
+    }
+
+    .tile[data-v="4"] {
+      background: #dcedc8;
+    }
+
+    .tile[data-v="8"] {
+      background: #c5e1a5;
+    }
+
+    .tile[data-v="16"] {
+      background: #aed581;
+    }
+
+    .tile[data-v="32"] {
+      background: #8bc34a;
+    }
+
+    .tile[data-v="64"] {
+      background: #7cb342;
+    }
+
+    .tile[data-v="128"] {
+      background: #558b2f;
+    }
+
+    .tile[data-v="256"] {
+      background: #f9a825;
+    }
+
+    .tile[data-v="512"] {
+      background: #f57f17;
+    }
+
+    .tile[data-v="1024"] {
+      background: #e65100;
+    }
+
+    .tile[data-v="2048"] {
+      background: #b71c1c;
+    }
+
+    .tile-emoji {
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      line-height: 1;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .15));
+    }
+
+    .tile-num {
+      font-size: clamp(0.6rem, 2vw, 0.85rem);
+      color: #2e4a1a;
+      opacity: 0.7;
+      margin-top: 1px;
+      letter-spacing: .5px;
+    }
+
+    .tile[data-v="128"] .tile-num,
+    .tile[data-v="256"] .tile-num,
+    .tile[data-v="512"] .tile-num,
+    .tile[data-v="1024"] .tile-num,
+    .tile[data-v="2048"] .tile-num {
+      color: #fff;
+    }
+
+    /* Tile animations */
+    @keyframes tileAppear {
+      0% {
+        transform: scale(0.3);
+        opacity: 0;
+      }
+
+      70% {
+        transform: scale(1.12);
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes tileMerge {
+      0% {
+        transform: scale(1);
+      }
+
+      40% {
+        transform: scale(1.22);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .tile.new {
+      animation: tileAppear .22s cubic-bezier(.17, .67, .35, 1.4) forwards;
+    }
+
+    .tile.merged {
+      animation: tileMerge .2s cubic-bezier(.17, .67, .35, 1.4) forwards;
+    }
+
+    /* Score pop */
+    .score-pop {
+      position: fixed;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.4rem;
+      color: var(--accent);
+      text-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+      pointer-events: none;
+      z-index: 300;
+      animation: scorePop .7s ease forwards;
+    }
+
+    @keyframes scorePop {
+      0% {
+        transform: translateY(0) scale(.8);
+        opacity: 1;
+      }
+
+      60% {
+        transform: translateY(-36px) scale(1.2);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(-60px) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* D-pad */
+    .dpad {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 6px;
+      width: min(160px, 42vw);
+      height: min(160px, 42vw);
+      margin: 10px auto 6px;
+    }
+
+    .dp {
+      background: rgba(255, 255, 255, .72);
+      border-radius: 14px;
+      border: none;
+      font-size: clamp(1.1rem, 4vw, 1.5rem);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, .14), 0 2px 8px rgba(0, 0, 0, .1);
+      transition: transform .08s, box-shadow .08s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .dp:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, .14);
+    }
+
+    .dp.center {
+      background: rgba(139, 195, 74, .3);
+      pointer-events: none;
+      font-size: 1.1rem;
+    }
+
+    .dp.empty {
+      background: transparent;
+      box-shadow: none;
+      pointer-events: none;
+    }
+
+    /* Overlays */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 40, 10, .5);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .card {
+      background: linear-gradient(150deg, #fffef0, #f1ffe4);
+      border-radius: 28px;
+      padding: clamp(22px, 6vw, 38px);
+      text-align: center;
+      width: min(320px, 90vw);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .28), 0 0 0 2.5px #8bc34a;
+      animation: cardIn .3s cubic-bezier(.17, .67, .35, 1.4);
+    }
+
+    @keyframes cardIn {
+      from {
+        transform: scale(.7) translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .card-icon {
+      font-size: clamp(3rem, 10vw, 4.5rem);
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(1.4rem, 5vw, 2rem);
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .card-body {
+      font-size: clamp(.8rem, 3vw, .95rem);
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .card-score {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(1.8rem, 6vw, 2.6rem);
+      color: var(--accent);
+      margin: 10px 0 4px;
+    }
+
+    .card-best {
+      font-size: .82rem;
+      color: #888;
+      font-weight: 800;
+    }
+
+    .big-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #8bc34a, #558b2f);
+      color: #fff;
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(1rem, 4vw, 1.2rem);
+      padding: 13px 34px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 14px;
+      box-shadow: 0 5px 0 #3a6e18, 0 8px 20px rgba(0, 0, 0, .2);
+      letter-spacing: .5px;
+      transition: transform .1s, box-shadow .1s;
+    }
+
+    .big-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #3a6e18, 0 4px 10px rgba(0, 0, 0, .15);
+    }
+
+    /* Level map at the top of tile */
+    .tile-badge {
+      position: absolute;
+      top: 3px;
+      right: 5px;
+      font-size: 0.55rem;
+      font-weight: 900;
+      color: rgba(0, 0, 0, .3);
+      font-family: 'Nunito', sans-serif;
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- Floating leaves -->
-<script>
-  const leafEmojis = ['🥬','🌿','🍃','🌱'];
-  for (let i = 0; i < 8; i++) {
-    const l = document.createElement('div');
-    l.className = 'leaf';
-    l.textContent = leafEmojis[i % leafEmojis.length];
-    l.style.left = (Math.random() * 100) + 'vw';
-    l.style.animationDuration = (12 + Math.random() * 14) + 's';
-    l.style.animationDelay = -(Math.random() * 20) + 's';
-    l.style.fontSize = (1 + Math.random() * 1.2) + 'rem';
-    document.body.appendChild(l);
-  }
-</script>
-
-<!-- Header -->
-<div class="header">
-  <div class="title-block">
-    <div class="title">🪿 鵝吃菜 2048</div>
-    <div class="subtitle">合併高麗菜，讓鵝鵝越吃越多！</div>
-  </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-    <div class="score-group">
-      <div class="score-pill"><div class="slabel">分數</div><div class="sval" id="score-v">0</div></div>
-      <div class="score-pill"><div class="slabel">最高</div><div class="sval" id="best-v">0</div></div>
-    </div>
-    <button class="new-btn" id="new-btn">🔄 新遊戲</button>
-  </div>
-</div>
-
-<div class="hint">← → ↑ ↓ 滑動方向，相同菜合併！</div>
-
-<!-- Board -->
-<div class="board-wrap" id="board-wrap">
-  <div class="grid-bg" id="grid-bg"></div>
-  <div class="tiles-layer" id="tiles-layer"></div>
-</div>
-
-<!-- D-pad -->
-<div class="dpad">
-  <div class="dp empty"></div>
-  <button class="dp" id="dp-up">⬆️</button>
-  <div class="dp empty"></div>
-  <button class="dp" id="dp-left">⬅️</button>
-  <div class="dp center">🥬</div>
-  <button class="dp" id="dp-right">➡️</button>
-  <div class="dp empty"></div>
-  <button class="dp" id="dp-down">⬇️</button>
-  <div class="dp empty"></div>
-</div>
-
-<!-- Start overlay -->
-<div class="overlay" id="start-overlay">
-  <div class="card">
-    <div class="card-icon">🪿</div>
-    <div class="card-title">鵝吃菜 2048！</div>
-    <div class="card-body">
-      滑動格子，讓相同的高麗菜合併！<br><br>
-      🥬 小菜苗 → 🥬🥬 合併 → 越來越大棵！<br>
-      目標：達到 <strong>鵝王等級（2048）</strong>！<br><br>
-      用方向鍵或手指滑動操作
-    </div>
-    <button class="big-btn" id="start-btn">開始吃菜！🥬</button>
-  </div>
-</div>
-
-<!-- Win overlay -->
-<div class="overlay hidden" id="win-overlay">
-  <div class="card">
-    <div class="card-icon">👑</div>
-    <div class="card-title">鵝王誕生！</div>
-    <div class="card-body">你達成了 2048！鵝鵝吃遍天下高麗菜！</div>
-    <div class="card-score" id="win-score">0 分</div>
-    <button class="big-btn" id="keep-btn">繼續挑戰！</button>
-    <br>
-    <button class="big-btn" style="background:linear-gradient(135deg,#f57f17,#e65100);margin-top:8px;box-shadow:0 5px 0 #b34700" id="new-from-win">重新開始</button>
-  </div>
-</div>
-
-<!-- Game over overlay -->
-<div class="overlay hidden" id="over-overlay">
-  <div class="card">
-    <div class="card-icon" id="over-icon">😵</div>
-    <div class="card-title" id="over-title">沒地方走了！</div>
-    <div class="card-body" id="over-body">鵝鵝吃太撐了，格子全滿了...</div>
-    <div class="card-score" id="over-score">0 分</div>
-    <div class="card-best" id="over-best"></div>
-    <button class="big-btn" id="retry-btn">再吃一次！🥬</button>
-  </div>
-</div>
-
-<script>
-// ── Tile visual config ──
-const TILE_INFO = {
-  1:    { emoji: '🌱', label: '菜苗',   num: '1'    },
-  2:    { emoji: '🌿', label: '小葉',   num: '2'    },
-  4:    { emoji: '🥗', label: '嫩菜',   num: '4'    },
-  8:    { emoji: '🥬', label: '小棵',   num: '8'    },
-  16:   { emoji: '🥬', label: '中棵',   num: '16'   },
-  32:   { emoji: '🥦', label: '大棵',   num: '32'   },
-  64:   { emoji: '🫑', label: '特大',   num: '64'   },
-  128:  { emoji: '🪿',  label: '鵝咬一口', num: '128' },
-  256:  { emoji: '🪿🥬', label: '鵝大吃', num: '256' },
-  512:  { emoji: '🪿💨', label: '鵝狂吞', num: '512' },
-  1024: { emoji: '🪿🔥', label: '鵝神',  num: '1024' },
-  2048: { emoji: '👑🪿', label: '鵝王！', num: '2048' },
-};
-function getTileInfo(v) {
-  if (TILE_INFO[v]) return TILE_INFO[v];
-  return { emoji: '🥬', label: String(v), num: String(v) };
-}
-
-// ── State ──
-const SIZE = 4;
-let board = [], score = 0, best = +localStorage.getItem('goose2048_best') || 0;
-let won = false, over = false;
-const scoreEl = document.getElementById('score-v');
-const bestEl  = document.getElementById('best-v');
-bestEl.textContent = best;
-
-// ── Board init ──
-const gridBg    = document.getElementById('grid-bg');
-const tilesLayer = document.getElementById('tiles-layer');
-for (let i = 0; i < 16; i++) {
-  gridBg.innerHTML += `<div class="cell-bg"></div>`;
-  tilesLayer.innerHTML += `<div></div>`; // placeholder
-}
-const cells = tilesLayer.children; // 16 divs
-
-// ── Game logic ──
-function newGame() {
-  board = Array.from({length:SIZE}, () => Array(SIZE).fill(0));
-  score = 0; won = false; over = false;
-  scoreEl.textContent = 0;
-  addRandom(); addRandom();
-  renderAll();
-}
-
-function addRandom() {
-  const empty = [];
-  for (let r = 0; r < SIZE; r++)
-    for (let c = 0; c < SIZE; c++)
-      if (!board[r][c]) empty.push([r,c]);
-  if (!empty.length) return false;
-  const [r,c] = empty[Math.floor(Math.random()*empty.length)];
-  board[r][c] = Math.random() < 0.85 ? 1 : 2;
-  return [r,c];
-}
-
-// Slide one row/col left; returns { row, merged, pts }
-function slideLeft(row) {
-  let line = row.filter(v => v);
-  let merged = Array(line.length).fill(false);
-  let pts = 0;
-  for (let i = 0; i < line.length - 1; i++) {
-    if (line[i] === line[i+1] && !merged[i]) {
-      line[i] *= 2; pts += line[i];
-      line.splice(i+1,1);
-      merged[i] = true;
+  <!-- Floating leaves -->
+  <script>
+    const leafEmojis = ['🥬', '🌿', '🍃', '🌱'];
+    for (let i = 0; i < 8; i++) {
+      const l = document.createElement('div');
+      l.className = 'leaf';
+      l.textContent = leafEmojis[i % leafEmojis.length];
+      l.style.left = (Math.random() * 100) + 'vw';
+      l.style.animationDuration = (12 + Math.random() * 14) + 's';
+      l.style.animationDelay = -(Math.random() * 20) + 's';
+      l.style.fontSize = (1 + Math.random() * 1.2) + 'rem';
+      document.body.appendChild(l);
     }
-  }
-  while (line.length < SIZE) line.push(0);
-  return { row: line, pts };
-}
+  </script>
 
-function move(dir) {
-  let moved = false, totalPts = 0;
-  const prev = board.map(r=>[...r]);
+  <!-- Header -->
+  <div class="header">
+    <div class="title-block">
+      <div class="title">🪿 鵝吃菜 2048</div>
+      <div class="subtitle">合併高麗菜，讓鵝鵝越吃越多！</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <div class="score-group">
+        <div class="score-pill">
+          <div class="slabel">分數</div>
+          <div class="sval" id="score-v">0</div>
+        </div>
+        <div class="score-pill">
+          <div class="slabel">最高</div>
+          <div class="sval" id="best-v">0</div>
+        </div>
+      </div>
+      <button class="new-btn" id="new-btn">🔄 新遊戲</button>
+    </div>
+  </div>
 
-  // Rotate board so we always slideLeft
-  let b = rotate(board, dir);
-  for (let r = 0; r < SIZE; r++) {
-    const { row, pts } = slideLeft(b[r]);
-    if (row.join() !== b[r].join()) moved = true;
-    b[r] = row; totalPts += pts;
-  }
-  b = unrotate(b, dir);
+  <div class="hint">← → ↑ ↓ 滑動方向，相同菜合併！</div>
 
-  if (!moved) return;
-  board = b; score += totalPts;
-  if (score > best) { best = score; localStorage.setItem('goose2048_best', best); bestEl.textContent = best; }
-  scoreEl.textContent = score;
-  if (totalPts > 0) showScorePop(totalPts);
+  <!-- Board -->
+  <div class="board-wrap" id="board-wrap">
+    <div class="grid-bg" id="grid-bg"></div>
+    <div class="tiles-layer" id="tiles-layer"></div>
+  </div>
 
-  const pos = addRandom();
-  renderAll(pos);
+  <!-- D-pad -->
+  <div class="dpad">
+    <div class="dp empty"></div>
+    <button class="dp" id="dp-up">⬆️</button>
+    <div class="dp empty"></div>
+    <button class="dp" id="dp-left">⬅️</button>
+    <div class="dp center">🥬</div>
+    <button class="dp" id="dp-right">➡️</button>
+    <div class="dp empty"></div>
+    <button class="dp" id="dp-down">⬇️</button>
+    <div class="dp empty"></div>
+  </div>
 
-  if (!won && board.some(r => r.some(v => v >= 2048))) {
-    won = true;
-    document.getElementById('win-score').textContent = score + ' 分';
-    setTimeout(() => document.getElementById('win-overlay').classList.remove('hidden'), 400);
-  } else if (isGameOver()) {
-    over = true;
-    setTimeout(showGameOver, 350);
-  }
-}
+  <!-- Start overlay -->
+  <div class="overlay" id="start-overlay">
+    <div class="card">
+      <div class="card-icon">🪿</div>
+      <div class="card-title">鵝吃菜 2048！</div>
+      <div class="card-body" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px;">
+        <div>
+          滑動格子，讓相同的高麗菜合併！<br>
+          <span style="color: #558b2f; font-weight: bold; font-size: 0.9em;">🥬 小菜苗 ＋ 🥬 相同 ➔ 越來越大棵！</span>
+        </div>
+        <div
+          style="background: rgba(255, 255, 255, 0.7); border-radius: 12px; padding: 10px 8px; font-size: 0.85em; line-height: 1.8; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); color: #444;">
+          🌱菜苗➔ 🌿小葉➔ 🥗嫩菜➔ 🥬小棵<br>
+          ➔ 🥦大棵 ➔ 🫑特大 ➔ 🪿鵝咬一口<br>
+          ➔ 🪿🥬鵝大吃 ➔ 🪿💨鵝狂吞<br>
+          ➔ 🪿🔥鵝神 ➔ 👑🪿鵝王
+        </div>
+        <div>
+          目標：達到 <strong style="color: #e65100; font-size: 1.1em;">鵝王等級（2048）</strong>！<br>
+          <span style="font-size: 0.85em; color: #888;">用方向鍵或手指滑動操作</span>
+        </div>
+      </div>
+      <button class="big-btn" id="start-btn">開始吃菜！🥬</button>
+    </div>
+  </div>
 
-function rotate(b, dir) {
-  if (dir === 'left')  return b.map(r=>[...r]);
-  if (dir === 'right') return b.map(r=>[...r].reverse());
-  if (dir === 'up')    return transpose(b).map(r=>[...r]);
-  if (dir === 'down')  return transpose(b).map(r=>[...r].reverse());
-}
-function unrotate(b, dir) {
-  if (dir === 'left')  return b.map(r=>[...r]);
-  if (dir === 'right') return b.map(r=>[...r].reverse());
-  if (dir === 'up')    return transpose(b);
-  if (dir === 'down')  { b = b.map(r=>[...r].reverse()); return transpose(b); }
-}
-function transpose(b) {
-  return b[0].map((_, c) => b.map(r => r[c]));
-}
+  <!-- Win overlay -->
+  <div class="overlay hidden" id="win-overlay">
+    <div class="card">
+      <div class="card-icon">👑</div>
+      <div class="card-title">鵝王誕生！</div>
+      <div class="card-body">你達成了 2048！鵝鵝吃遍天下高麗菜！</div>
+      <div class="card-score" id="win-score">0 分</div>
+      <button class="big-btn" id="keep-btn">繼續挑戰！</button>
+      <br>
+      <button class="big-btn"
+        style="background:linear-gradient(135deg,#f57f17,#e65100);margin-top:8px;box-shadow:0 5px 0 #b34700"
+        id="new-from-win">重新開始</button>
+    </div>
+  </div>
 
-function isGameOver() {
-  for (let r = 0; r < SIZE; r++)
-    for (let c = 0; c < SIZE; c++) {
-      if (!board[r][c]) return false;
-      if (r < SIZE-1 && board[r][c] === board[r+1][c]) return false;
-      if (c < SIZE-1 && board[r][c] === board[r][c+1]) return false;
+  <!-- Game over overlay -->
+  <div class="overlay hidden" id="over-overlay">
+    <div class="card">
+      <div class="card-icon" id="over-icon">😵</div>
+      <div class="card-title" id="over-title">沒地方走了！</div>
+      <div class="card-body" id="over-body">鵝鵝吃太撐了，格子全滿了...</div>
+      <div class="card-score" id="over-score">0 分</div>
+      <div class="card-best" id="over-best"></div>
+      <button class="big-btn" id="retry-btn">再吃一次！🥬</button>
+    </div>
+  </div>
+
+  <script>
+    // ── Tile visual config ──
+    const TILE_INFO = {
+      1: { emoji: '🌱', label: '菜苗', num: '1' },
+      2: { emoji: '🌿', label: '小葉', num: '2' },
+      4: { emoji: '🥗', label: '嫩菜', num: '4' },
+      8: { emoji: '🥬', label: '小棵', num: '8' },
+      16: { emoji: '🥬', label: '中棵', num: '16' },
+      32: { emoji: '🥦', label: '大棵', num: '32' },
+      64: { emoji: '🫑', label: '特大', num: '64' },
+      128: { emoji: '🪿', label: '鵝咬一口', num: '128' },
+      256: { emoji: '🪿🥬', label: '鵝大吃', num: '256' },
+      512: { emoji: '🪿💨', label: '鵝狂吞', num: '512' },
+      1024: { emoji: '🪿🔥', label: '鵝神', num: '1024' },
+      2048: { emoji: '👑🪿', label: '鵝王！', num: '2048' },
+    };
+    function getTileInfo(v) {
+      if (TILE_INFO[v]) return TILE_INFO[v];
+      return { emoji: '🥬', label: String(v), num: String(v) };
     }
-  return true;
-}
 
-function showGameOver() {
-  const msgs = [
-    [0,    '😢', '太可惜了！', '鵝鵝還沒吃夠...'],
-    [20,   '😅', '還不錯喔！', '鵝鵝吃了不少菜！'],
-    [100,  '🥬', '菜吃很多！', '鵝鵝超滿足！'],
-    [500,  '🌟', '超厲害！', '鵝鵝已封神！'],
-    [1000, '👑', '鵝神降臨！', '傳說級吃菜高手！'],
-  ];
-  let [,icon,title,body] = msgs[0];
-  for (const [t,i,ti,b] of msgs) if (score>=t){icon=i;title=ti;body=b;}
-  document.getElementById('over-icon').textContent = icon;
-  document.getElementById('over-title').textContent = title;
-  document.getElementById('over-body').textContent = body;
-  document.getElementById('over-score').textContent = score + ' 分';
-  document.getElementById('over-best').textContent = score >= best ? '🎉 新紀錄！' : `最高：${best} 分`;
-  document.getElementById('over-overlay').classList.remove('hidden');
-}
+    // ── State ──
+    const SIZE = 4;
+    let board = [], score = 0, best = +localStorage.getItem('goose2048_best') || 0;
+    let won = false, over = false;
+    const scoreEl = document.getElementById('score-v');
+    const bestEl = document.getElementById('best-v');
+    bestEl.textContent = best;
 
-// ── Render ──
-function renderAll(newPos) {
-  for (let r = 0; r < SIZE; r++) {
-    for (let c = 0; c < SIZE; c++) {
-      const v = board[r][c];
-      const cell = cells[r*SIZE+c];
-      if (!v) { cell.innerHTML = ''; cell.className = ''; continue; }
-      const info = getTileInfo(v);
-      const isNew = newPos && newPos[0]===r && newPos[1]===c;
-      cell.className = 'tile' + (isNew ? ' new' : '');
-      cell.setAttribute('data-v', Math.min(v, 2048));
-      cell.innerHTML = `
+    // ── Board init ──
+    const gridBg = document.getElementById('grid-bg');
+    const tilesLayer = document.getElementById('tiles-layer');
+    for (let i = 0; i < 16; i++) {
+      gridBg.innerHTML += `<div class="cell-bg"></div>`;
+      tilesLayer.innerHTML += `<div></div>`; // placeholder
+    }
+    const cells = tilesLayer.children; // 16 divs
+
+    // ── Game logic ──
+    function newGame() {
+      board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+      score = 0; won = false; over = false;
+      scoreEl.textContent = 0;
+      addRandom(); addRandom();
+      renderAll();
+    }
+
+    function addRandom() {
+      const empty = [];
+      for (let r = 0; r < SIZE; r++)
+        for (let c = 0; c < SIZE; c++)
+          if (!board[r][c]) empty.push([r, c]);
+      if (!empty.length) return false;
+      const [r, c] = empty[Math.floor(Math.random() * empty.length)];
+      board[r][c] = Math.random() < 0.85 ? 1 : 2;
+      return [r, c];
+    }
+
+    // Slide one row/col left; returns { row, merged, pts }
+    function slideLeft(row) {
+      let line = row.filter(v => v);
+      let merged = Array(line.length).fill(false);
+      let pts = 0;
+      for (let i = 0; i < line.length - 1; i++) {
+        if (line[i] === line[i + 1] && !merged[i]) {
+          line[i] *= 2; pts += line[i];
+          line.splice(i + 1, 1);
+          merged[i] = true;
+        }
+      }
+      while (line.length < SIZE) line.push(0);
+      return { row: line, pts };
+    }
+
+    function move(dir) {
+      let moved = false, totalPts = 0;
+      const prev = board.map(r => [...r]);
+
+      // Rotate board so we always slideLeft
+      let b = rotate(board, dir);
+      for (let r = 0; r < SIZE; r++) {
+        const { row, pts } = slideLeft(b[r]);
+        if (row.join() !== b[r].join()) moved = true;
+        b[r] = row; totalPts += pts;
+      }
+      b = unrotate(b, dir);
+
+      if (!moved) return;
+      board = b; score += totalPts;
+      if (score > best) { best = score; localStorage.setItem('goose2048_best', best); bestEl.textContent = best; }
+      scoreEl.textContent = score;
+      if (totalPts > 0) showScorePop(totalPts);
+
+      const pos = addRandom();
+      renderAll(pos);
+
+      if (!won && board.some(r => r.some(v => v >= 2048))) {
+        won = true;
+        document.getElementById('win-score').textContent = score + ' 分';
+        setTimeout(() => document.getElementById('win-overlay').classList.remove('hidden'), 400);
+      } else if (isGameOver()) {
+        over = true;
+        setTimeout(showGameOver, 350);
+      }
+    }
+
+    function rotate(b, dir) {
+      if (dir === 'left') return b.map(r => [...r]);
+      if (dir === 'right') return b.map(r => [...r].reverse());
+      if (dir === 'up') return transpose(b).map(r => [...r]);
+      if (dir === 'down') return transpose(b).map(r => [...r].reverse());
+    }
+    function unrotate(b, dir) {
+      if (dir === 'left') return b.map(r => [...r]);
+      if (dir === 'right') return b.map(r => [...r].reverse());
+      if (dir === 'up') return transpose(b);
+      if (dir === 'down') { b = b.map(r => [...r].reverse()); return transpose(b); }
+    }
+    function transpose(b) {
+      return b[0].map((_, c) => b.map(r => r[c]));
+    }
+
+    function isGameOver() {
+      for (let r = 0; r < SIZE; r++)
+        for (let c = 0; c < SIZE; c++) {
+          if (!board[r][c]) return false;
+          if (r < SIZE - 1 && board[r][c] === board[r + 1][c]) return false;
+          if (c < SIZE - 1 && board[r][c] === board[r][c + 1]) return false;
+        }
+      return true;
+    }
+
+    function showGameOver() {
+      const msgs = [
+        [0, '😢', '太可惜了！', '鵝鵝還沒吃夠...'],
+        [20, '😅', '還不錯喔！', '鵝鵝吃了不少菜！'],
+        [100, '🥬', '菜吃很多！', '鵝鵝超滿足！'],
+        [500, '🌟', '超厲害！', '鵝鵝已封神！'],
+        [1000, '👑', '鵝神降臨！', '傳說級吃菜高手！'],
+      ];
+      let [, icon, title, body] = msgs[0];
+      for (const [t, i, ti, b] of msgs) if (score >= t) { icon = i; title = ti; body = b; }
+      document.getElementById('over-icon').textContent = icon;
+      document.getElementById('over-title').textContent = title;
+      document.getElementById('over-body').textContent = body;
+      document.getElementById('over-score').textContent = score + ' 分';
+      document.getElementById('over-best').textContent = score >= best ? '🎉 新紀錄！' : `最高：${best} 分`;
+      document.getElementById('over-overlay').classList.remove('hidden');
+    }
+
+    // ── Render ──
+    function renderAll(newPos) {
+      for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+          const v = board[r][c];
+          const cell = cells[r * SIZE + c];
+          if (!v) { cell.innerHTML = ''; cell.className = ''; continue; }
+          const info = getTileInfo(v);
+          const isNew = newPos && newPos[0] === r && newPos[1] === c;
+          cell.className = 'tile' + (isNew ? ' new' : '');
+          cell.setAttribute('data-v', Math.min(v, 2048));
+          cell.innerHTML = `
         <div class="tile-emoji">${info.emoji}</div>
         <div class="tile-num">${info.label}</div>`;
+        }
+      }
     }
-  }
-}
 
-function showScorePop(pts) {
-  const board = document.getElementById('board-wrap');
-  const rect = board.getBoundingClientRect();
-  const pop = document.createElement('div');
-  pop.className = 'score-pop';
-  pop.textContent = '+' + pts;
-  pop.style.left = (rect.left + rect.width/2 - 20) + 'px';
-  pop.style.top  = (rect.top  + rect.height/2) + 'px';
-  document.body.appendChild(pop);
-  setTimeout(() => pop.remove(), 700);
-}
+    function showScorePop(pts) {
+      const board = document.getElementById('board-wrap');
+      const rect = board.getBoundingClientRect();
+      const pop = document.createElement('div');
+      pop.className = 'score-pop';
+      pop.textContent = '+' + pts;
+      pop.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+      pop.style.top = (rect.top + rect.height / 2) + 'px';
+      document.body.appendChild(pop);
+      setTimeout(() => pop.remove(), 700);
+    }
 
-// ── Controls ──
-document.addEventListener('keydown', e => {
-  if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) {
-    e.preventDefault();
-    const map = {ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'};
-    move(map[e.key]);
-  }
-});
+    // ── Controls ──
+    document.addEventListener('keydown', e => {
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+        e.preventDefault();
+        const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
+        move(map[e.key]);
+      }
+    });
 
-document.getElementById('dp-up').addEventListener('pointerdown',    e=>{e.preventDefault();move('up');});
-document.getElementById('dp-down').addEventListener('pointerdown',  e=>{e.preventDefault();move('down');});
-document.getElementById('dp-left').addEventListener('pointerdown',  e=>{e.preventDefault();move('left');});
-document.getElementById('dp-right').addEventListener('pointerdown', e=>{e.preventDefault();move('right');});
+    document.getElementById('dp-up').addEventListener('pointerdown', e => { e.preventDefault(); move('up'); });
+    document.getElementById('dp-down').addEventListener('pointerdown', e => { e.preventDefault(); move('down'); });
+    document.getElementById('dp-left').addEventListener('pointerdown', e => { e.preventDefault(); move('left'); });
+    document.getElementById('dp-right').addEventListener('pointerdown', e => { e.preventDefault(); move('right'); });
 
-let tx=0, ty=0;
-document.getElementById('board-wrap').addEventListener('touchstart', e=>{
-  tx = e.touches[0].clientX; ty = e.touches[0].clientY;
-}, {passive:true});
-document.getElementById('board-wrap').addEventListener('touchend', e=>{
-  const dx = e.changedTouches[0].clientX - tx;
-  const dy = e.changedTouches[0].clientY - ty;
-  if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-  if (Math.abs(dx) > Math.abs(dy)) move(dx > 0 ? 'right' : 'left');
-  else move(dy > 0 ? 'down' : 'up');
-}, {passive:true});
+    let tx = 0, ty = 0;
+    document.getElementById('board-wrap').addEventListener('touchstart', e => {
+      tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+    }, { passive: true });
+    document.getElementById('board-wrap').addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx;
+      const dy = e.changedTouches[0].clientY - ty;
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      if (Math.abs(dx) > Math.abs(dy)) move(dx > 0 ? 'right' : 'left');
+      else move(dy > 0 ? 'down' : 'up');
+    }, { passive: true });
 
-document.getElementById('new-btn').addEventListener('click', ()=>{ hideAll(); newGame(); });
-document.getElementById('start-btn').addEventListener('click', ()=>{ hideAll(); newGame(); });
-document.getElementById('retry-btn').addEventListener('click', ()=>{ hideAll(); newGame(); });
-document.getElementById('keep-btn').addEventListener('click', ()=>{ document.getElementById('win-overlay').classList.add('hidden'); });
-document.getElementById('new-from-win').addEventListener('click', ()=>{ hideAll(); newGame(); });
+    document.getElementById('new-btn').addEventListener('click', () => { hideAll(); newGame(); });
+    document.getElementById('start-btn').addEventListener('click', () => { hideAll(); newGame(); });
+    document.getElementById('retry-btn').addEventListener('click', () => { hideAll(); newGame(); });
+    document.getElementById('keep-btn').addEventListener('click', () => { document.getElementById('win-overlay').classList.add('hidden'); });
+    document.getElementById('new-from-win').addEventListener('click', () => { hideAll(); newGame(); });
 
-function hideAll() {
-  document.getElementById('start-overlay').classList.add('hidden');
-  document.getElementById('win-overlay').classList.add('hidden');
-  document.getElementById('over-overlay').classList.add('hidden');
-}
-</script>
+    function hideAll() {
+      document.getElementById('start-overlay').classList.add('hidden');
+      document.getElementById('win-overlay').classList.add('hidden');
+      document.getElementById('over-overlay').classList.add('hidden');
+    }
+  </script>
 </body>
+
 </html>
