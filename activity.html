@@ -540,8 +540,16 @@
           <div style="display:flex;gap:8px">
             <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
             <button type="button" onclick="saveGhToken()" class="btn-primary" style="white-space:nowrap;padding:10px 14px;font-size:13px">儲存</button>
+            <button type="button" onclick="verifyGhToken()" class="btn-ghost" style="white-space:nowrap;padding:10px 14px;font-size:13px">驗證</button>
           </div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:5px">Token 僅存於本機 localStorage，不會傳送至第三方。需要 <code>repo</code> 權限。<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener" style="color:var(--coral)">申請 Token →</a></div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:5px">
+            Token 僅存於本機，不會傳送至第三方。<br>
+            Classic Token 需勾選 <code>repo</code>（私有）或 <code>public_repo</code>（公開）。
+            Fine-grained Token 需開啟該 Repo 的 <strong>Contents → Read and write</strong>。<br>
+            <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener" style="color:var(--coral)">申請 Classic Token →</a>
+            &nbsp;
+            <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener" style="color:var(--coral)">申請 Fine-grained Token →</a>
+          </div>
           <div id="gh-token-status" style="font-size:12px;margin-top:6px"></div>
         </div>
 
@@ -1522,6 +1530,36 @@ function saveGhToken() {
   setGhStatus('✅ Token 已儲存', 'ok');
 }
 function getGhToken() { return localStorage.getItem(GH_TOKEN_KEY) || ''; }
+function verifyGhToken() {
+  var token = document.getElementById('gh-token').value.trim() || getGhToken();
+  if (!token) { setGhStatus('⚠️ 請先輸入 Token', 'warning'); return; }
+  setGhStatus('🔍 驗證中…', 'warning');
+  // Test write access by fetching the repo metadata
+  fetch('https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO, {
+    headers: {
+      'Authorization': 'token ' + token,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  })
+  .then(function(res) { return res.json().then(function(d) { return { status: res.status, data: d }; }); })
+  .then(function(r) {
+    if (r.status === 200) {
+      var perms = r.data.permissions || {};
+      if (perms.push || perms.admin) {
+        setGhStatus('✅ Token 有效，具備寫入權限', 'ok');
+      } else {
+        setGhStatus('⚠️ Token 有效但缺少寫入權限（需 public_repo 或 repo scope）', 'warning');
+      }
+    } else if (r.status === 401) {
+      setGhStatus('❌ Token 無效或已過期，請重新申請', 'error');
+    } else if (r.status === 404) {
+      setGhStatus('❌ 找不到 Repo（' + GH_OWNER + '/' + GH_REPO + '），請確認 Token 擁有者與 Repo 名稱', 'error');
+    } else {
+      setGhStatus('❌ 驗證失敗：' + (r.data.message || 'HTTP ' + r.status), 'error');
+    }
+  })
+  .catch(function() { setGhStatus('❌ 網路錯誤，無法連線至 GitHub', 'error'); });
+}
 function setGhStatus(msg, type) {
   var el = document.getElementById('gh-token-status');
   if (!el) return;
