@@ -1072,14 +1072,14 @@ function handleReg() {
 function shareEvent() {
   if (!currentEvent) return;
   var siteUrl = 'https://umoo125.github.io/umoo/activity.html';
-  var text = '【' + currentEvent.name + '】' + (currentEvent.tagline ? ' ' + currentEvent.tagline : '') +
+  var base = '【' + currentEvent.name + '】' + (currentEvent.tagline ? ' ' + currentEvent.tagline : '') +
              '\n📅 ' + (currentEvent.dateStart||'').replace(/-/g,'/') +
              (currentEvent.city ? '\n📍 ' + currentEvent.city : '') +
-             '\n\n活動廣場 activitysquare.tw\n' + siteUrl;
+             '\n\n活動廣場 activitysquare.tw';
   if (navigator.share) {
-    navigator.share({title: currentEvent.name, text: text, url: siteUrl}).catch(function(){});
+    navigator.share({title: currentEvent.name, text: base, url: siteUrl}).catch(function(){});
   } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(function(){ toast('✅ 活動資訊已複製到剪貼簿'); });
+    navigator.clipboard.writeText(base + '\n' + siteUrl).then(function(){ toast('✅ 活動資訊已複製到剪貼簿'); });
   } else {
     toast('✅ 複製活動資訊：' + currentEvent.name);
   }
