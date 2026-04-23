@@ -806,7 +806,7 @@
     <div class="success-box" id="success-box">
       <div class="success-icon-wrap">🎉</div>
       <div class="success-title">活動已成功上架！</div>
-      <div class="success-desc" id="success-desc">活動資料已寫入 JSON 資料庫，現在可以在首頁看到你的活動。</div>
+      <div class="success-desc" id="success-desc">活動資料已寫入快取，正在同步至 activities.json…</div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
         <button class="btn-next" onclick="showView('home')">← 回首頁查看</button>
         <button class="btn-back" onclick="showView('json');refreshJSON()">查看 JSON 資料</button>
@@ -1365,9 +1365,9 @@ function submitForm() {
   document.getElementById('fstep4').style.display='none';
   document.getElementById('success-box').style.display='block';
 
-  var msg = '「' + ev.name + '」已寫入資料庫，目前共有 ' + dbGetAll().length + ' 筆活動。';
-  if (coverFileData && coverFileData.dataUrl) msg += '\n封面圖片已儲存。';
-  document.getElementById('success-desc').textContent = msg;
+  var descEl = document.getElementById('success-desc');
+  var baseMsg = '「' + ev.name + '」已新增，目前共有 ' + dbGetAll().length + ' 筆活動。';
+  descEl.textContent = baseMsg + (getGhToken() ? '\nactivities.json 同步中…' : '\n尚未設定 GitHub Token，資料僅存於本機快取。');
   toast('🎉 「' + ev.name + '」已成功上架！');
   window.scrollTo({top:0,behavior:'smooth'});
 
@@ -1381,6 +1381,15 @@ function submitForm() {
       }
       localStorage.setItem(DB_KEY, JSON.stringify(list, null, 2));
       toast('📤 封面圖片已同步至 GitHub Pages');
+      syncActivitiesToGitHub(function(ok, err) {
+        if (ok) { descEl.textContent = baseMsg + '\n✅ activities.json 已同步至 GitHub。'; toast('📋 activities.json 已更新'); }
+        else toast('⚠️ activities.json 同步失敗：' + err);
+      });
+    });
+  } else if (getGhToken()) {
+    syncActivitiesToGitHub(function(ok, err) {
+      if (ok) { descEl.textContent = baseMsg + '\n✅ activities.json 已同步至 GitHub。'; toast('📋 activities.json 已更新'); }
+      else { descEl.textContent = baseMsg + '\n⚠️ activities.json 同步失敗：' + err; }
     });
   }
   } catch(e) {
@@ -1590,6 +1599,45 @@ function uploadCoverToGitHub(ev, callback) {
     else if (msg.includes('422')) msg = '檔案路徑格式錯誤';
     callback(null, msg);
   });
+}
+
+/* ══════════════════════
+   SYNC activities.json TO GITHUB
+══════════════════════ */
+function syncActivitiesToGitHub(callback) {
+  var token = getGhToken();
+  if (!token) { if (callback) callback(null, 'no token'); return; }
+
+  var jsonStr = JSON.stringify(dbGetAll(), null, 2);
+  var content = btoa(unescape(encodeURIComponent(jsonStr)));
+  var apiUrl = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/activities.json';
+  var headers = {
+    'Authorization': 'token ' + token,
+    'Accept': 'application/vnd.github.v3+json'
+  };
+
+  fetch(apiUrl, { headers: headers })
+    .then(function(res) { return res.status === 200 ? res.json() : null; })
+    .then(function(existing) {
+      var body = {
+        message: 'Update activities.json',
+        content: content,
+        branch: GH_BRANCH
+      };
+      if (existing && existing.sha) body.sha = existing.sha;
+      return fetch(apiUrl, {
+        method: 'PUT',
+        headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }),
+        body: JSON.stringify(body)
+      });
+    })
+    .then(function(res) {
+      if (!res.ok) return res.json().then(function(e) { throw new Error(e.message || 'HTTP ' + res.status); });
+      if (callback) callback(true, null);
+    })
+    .catch(function(err) {
+      if (callback) callback(null, err && err.message ? err.message : String(err));
+    });
 }
 
 /* ══════════════════════
