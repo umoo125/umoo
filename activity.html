@@ -1631,7 +1631,17 @@ function syncActivitiesToGitHub(callback) {
   };
 
   fetch(apiUrl, { headers: headers })
-    .then(function(res) { return res.status === 200 ? res.json() : null; })
+    .then(function(res) {
+      if (res.status === 200) return res.json();
+      if (res.status === 404) return null; // file doesn't exist yet — will create
+      // other errors (401, 403…): surface immediately
+      return res.json().then(function(e) {
+        var msg = e.message || 'HTTP ' + res.status;
+        if (res.status === 401 || msg.indexOf('Bad credentials') !== -1) msg = 'Token 無效或過期，請重新設定';
+        else if (res.status === 403) msg = 'Token 缺少 repo 寫入權限';
+        throw new Error(msg);
+      });
+    })
     .then(function(existing) {
       var body = {
         message: 'Update activities.json',
@@ -1646,7 +1656,13 @@ function syncActivitiesToGitHub(callback) {
       });
     })
     .then(function(res) {
-      if (!res.ok) return res.json().then(function(e) { throw new Error(e.message || 'HTTP ' + res.status); });
+      if (!res.ok) return res.json().then(function(e) {
+        var msg = e.message || 'HTTP ' + res.status;
+        if (res.status === 401 || msg.indexOf('Bad credentials') !== -1) msg = 'Token 無效或過期，請重新設定';
+        else if (msg === 'Not Found') msg = 'Repo 不存在或 Token 缺少 repo 寫入權限';
+        else if (res.status === 422) msg = '檔案路徑格式錯誤';
+        throw new Error(msg);
+      });
       if (callback) callback(true, null);
     })
     .catch(function(err) {
