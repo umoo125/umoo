@@ -1,0 +1,1620 @@
+你最感<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>活動廣場 — 找到你最感興趣的活動</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral:#D85A30;--coral-light:#FAECE7;--coral-mid:#F0997B;--coral-dark:#993C1D;--coral-deep:#4A1B0C;
+    --teal:#0F6E56;--teal-light:#E1F5EE;--teal-mid:#1D9E75;
+    --blue-light:#E6F1FB;--blue-mid:#185FA5;
+    --purple-light:#EEEDFE;--purple-mid:#534AB7;
+    --green-light:#EAF3DE;--green-mid:#3B6D11;
+    --amber-light:#FAEEDA;--red-light:#FCEBEB;
+    --bg:#F5F3EF;--surface:#fff;
+    --border:rgba(0,0,0,.1);--border-md:rgba(0,0,0,.18);
+    --text:#1A1A1A;--text-2:#555550;--text-3:#999990;
+    --radius:10px;--radius-lg:14px;
+    --font:'Noto Sans TC',sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
+  .site-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+  .logo{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.5px;cursor:pointer}
+  .logo span{color:var(--coral)}
+  .header-nav{display:flex;gap:10px;align-items:center}
+  .btn-ghost{padding:7px 16px;border-radius:var(--radius);border:1px solid var(--border-md);background:transparent;font-size:13px;color:var(--text-2);cursor:pointer;font-family:var(--font);transition:all .15s}
+  .btn-ghost:hover{background:var(--bg)}
+  .btn-primary{padding:8px 20px;border-radius:var(--radius);border:none;background:var(--coral);color:#fff;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s}
+  .btn-primary:hover{opacity:.88}
+  .view{display:none}
+  .view.active{display:block}
+  #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(60px);background:#1A1A1A;color:#fff;padding:12px 22px;border-radius:var(--radius-lg);font-size:13px;font-weight:500;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #admin-bar{background:#1A1A1A;color:#ccc;font-size:12px;padding:8px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  #admin-bar strong{color:#fff}
+  #admin-bar button{font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid #555;background:transparent;color:#ccc;cursor:pointer;font-family:var(--font)}
+  #admin-bar button:hover{background:#333;color:#fff}
+  #admin-bar button.danger{border-color:#A32D2D;color:#E24B4A}
+  #admin-bar button.danger:hover{background:#A32D2D;color:#fff}
+  .hero{background:var(--coral-light);padding:56px 32px 44px;text-align:center;border-bottom:1px solid var(--coral-mid)}
+  .hero-badge{display:inline-block;font-size:12px;font-weight:500;background:var(--coral-mid);color:var(--coral-deep);padding:4px 12px;border-radius:20px;margin-bottom:14px}
+  .hero h1{font-size:32px;font-weight:700;color:var(--coral-deep);margin-bottom:10px;line-height:1.25;letter-spacing:-.5px}
+  .hero p{font-size:15px;color:var(--coral-dark);margin-bottom:28px}
+  .search-wrap{display:flex;gap:8px;max-width:500px;margin:0 auto}
+  .search-wrap input{flex:1;padding:11px 18px;border-radius:var(--radius-lg);border:1px solid var(--border-md);background:var(--surface);font-size:14px;color:var(--text);font-family:var(--font);outline:none;transition:border-color .15s}
+  .search-wrap input:focus{border-color:var(--coral);box-shadow:0 0 0 3px rgba(216,90,48,.1)}
+  .search-wrap .btn-primary{padding:11px 22px;font-size:14px;border-radius:var(--radius-lg)}
+  .filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:sticky;top:60px;z-index:90}
+  .filter-label{font-size:13px;color:var(--text-3);margin-right:2px}
+  .tag{font-size:12px;padding:5px 13px;border-radius:20px;border:1px solid var(--border-md);background:transparent;color:var(--text-2);cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap}
+  .tag:hover,.tag.active{background:var(--coral-light);color:var(--coral-dark);border-color:var(--coral-mid)}
+  .tag.active{font-weight:500}
+  .main-wrap{max-width:1160px;margin:0 auto;padding:28px 24px 48px}
+  .content-grid{display:grid;grid-template-columns:1fr 300px;gap:24px}
+  @media(max-width:900px){.content-grid{grid-template-columns:1fr}.sidebar{display:none}}
+  .section-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .section-title{font-size:15px;font-weight:500;color:var(--text)}
+  .featured-grid{display:grid;grid-template-columns:1.8fr 1fr;gap:14px;margin-bottom:28px}
+  @media(max-width:600px){.featured-grid{grid-template-columns:1fr}}
+  .card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+  .card-thumb{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:44px}
+  .card-body{padding:14px 16px 16px}
+  .badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;margin-bottom:8px}
+  .badge-hot{background:var(--coral-light);color:var(--coral-dark)}
+  .badge-new{background:var(--teal-light);color:var(--teal)}
+  .badge-free{background:var(--green-light);color:var(--green-mid)}
+  .badge-online{background:var(--purple-light);color:var(--purple-mid)}
+  .badge-user{background:var(--amber-light);color:#854F0B}
+  .card-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px;line-height:1.4}
+  .card-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text-3);margin-bottom:8px}
+  .card-desc{font-size:13px;color:var(--text-2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+  .price{font-size:14px;font-weight:500;color:var(--coral)}
+  .price-free{color:var(--teal)}
+  .reg-btn{font-size:12px;padding:6px 14px;background:var(--coral);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-family:var(--font);transition:opacity .15s}
+  .reg-btn:hover{opacity:.85}
+  .side-cards{display:flex;flex-direction:column;gap:14px}
+  .side-card .card-thumb{aspect-ratio:5/2;font-size:30px}
+  .side-card .card-body{padding:10px 14px 12px}
+  .side-card .card-title{font-size:13px}
+  .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:32px}
+  .cards-grid .card-thumb{font-size:34px}
+  .cards-grid .card-title{font-size:13px}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--text-3);font-size:14px;border:1.5px dashed var(--border-md);border-radius:var(--radius-lg);margin-bottom:32px}
+  .empty-state .e-icon{font-size:36px;margin-bottom:10px}
+  .sidebar{display:flex;flex-direction:column;gap:16px}
+  .s-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px}
+  .s-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:12px}
+  .ad-zone{background:var(--coral-light);border:1px dashed var(--coral-mid);border-radius:var(--radius-lg);padding:12px;text-align:center}
+  .ad-zone p{font-size:11px;color:var(--coral-dark);margin-bottom:8px;font-weight:500}
+  .ad-inner{background:var(--surface);border-radius:var(--radius);height:90px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-3)}
+  .list-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer}
+  .list-item:last-child{border-bottom:none}
+  .list-thumb{width:52px;height:40px;border-radius:var(--radius);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .list-ttl{font-size:12px;font-weight:500;color:var(--text);line-height:1.3;margin-bottom:2px}
+  .list-meta{font-size:11px;color:var(--text-3)}
+  .region-tags{display:flex;flex-wrap:wrap;gap:6px}
+  .db-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .stat-box{background:var(--bg);border-radius:var(--radius);padding:10px 12px}
+  .stat-label{font-size:11px;color:var(--text-3);margin-bottom:2px}
+  .stat-val{font-size:20px;font-weight:700;color:var(--text)}
+  .stat-val.accent{color:var(--coral)}
+  .submit-banner{background:linear-gradient(135deg,var(--coral) 0%,#B04020 100%);border-radius:var(--radius-lg);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin:8px 0 0}
+  .submit-banner h3{font-size:17px;font-weight:500;color:#fff;margin-bottom:4px}
+  .submit-banner p{font-size:13px;color:rgba(255,255,255,.8)}
+  .btn-white{padding:10px 24px;border-radius:var(--radius);border:none;background:#fff;color:var(--coral);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:opacity .15s}
+  .btn-white:hover{opacity:.92}
+  .site-footer{background:var(--surface);border-top:1px solid var(--border);padding:24px 32px;text-align:center;font-size:13px;color:var(--text-3)}
+  .footer-links{display:flex;gap:20px;justify-content:center;margin-bottom:8px;flex-wrap:wrap}
+  .footer-links a{color:var(--text-3);text-decoration:none}
+  .footer-links a:hover{color:var(--coral)}
+
+  /* FORM */
+  .form-page{max-width:760px;margin:0 auto;padding:28px 20px 56px}
+  .back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-2);background:none;border:none;cursor:pointer;font-family:var(--font);margin-bottom:16px;padding:0}
+  .back-btn:hover{color:var(--coral)}
+  .page-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .page-desc{font-size:13px;color:var(--text-2);margin-bottom:20px}
+  .req-note{color:var(--coral)}
+  .steps-bar{display:flex;align-items:flex-start;margin-bottom:24px}
+  .step-item{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+  .step-item:not(:last-child)::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:1px;background:var(--border-md);z-index:0}
+  .step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;z-index:1;border:1.5px solid var(--border-md);background:var(--surface);color:var(--text-3);transition:all .2s}
+  .step-dot.active{background:var(--coral);border-color:var(--coral);color:#fff}
+  .step-dot.done{background:var(--teal-mid);border-color:var(--teal-mid);color:#fff}
+  .step-lbl{font-size:11px;color:var(--text-3);margin-top:5px;text-align:center;line-height:1.3}
+  .step-lbl.active{color:var(--coral);font-weight:500}
+  .form-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:22px 24px;margin-bottom:14px}
+  .sec-label{font-size:11px;font-weight:500;color:var(--coral);letter-spacing:.8px;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+  .sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .field{margin-bottom:16px}
+  .field:last-child{margin-bottom:0}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:500px){.field-row{grid-template-columns:1fr}}
+  label{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px}
+  label .req{color:var(--coral);margin-left:2px}
+  label .hint{font-size:11px;font-weight:400;color:var(--text-3);margin-left:6px}
+  input[type=text],input[type=email],input[type=tel],input[type=date],input[type=number],input[type=url],select,textarea{width:100%;padding:10px 13px;border-radius:var(--radius);border:1px solid var(--border-md);background:var(--surface);font-size:14px;color:var(--text);font-family:var(--font);outline:none;transition:border-color .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--coral);box-shadow:0 0 0 3px rgba(216,90,48,.1)}
+  input.err,select.err,textarea.err{border-color:#E24B4A!important}
+  textarea{resize:vertical;min-height:88px;line-height:1.6}
+  select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
+  .char-count{font-size:11px;color:var(--text-3);text-align:right;margin-top:3px}
+  .err-msg{font-size:11px;color:#A32D2D;margin-top:4px;display:none}
+  .pill-group{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--radius);border:1px solid var(--border-md);cursor:pointer;font-size:13px;color:var(--text-2);transition:all .15s;user-select:none;font-family:var(--font)}
+  .pill:hover{border-color:var(--coral-mid);color:var(--coral-dark);background:var(--coral-light)}
+  .pill.sel{border-color:var(--coral);color:var(--coral-dark);background:var(--coral-light);font-weight:500}
+  .pill input{display:none}
+  .toggle-group{display:flex;gap:8px;flex-wrap:wrap}
+  .toggle-btn{padding:8px 18px;border-radius:var(--radius);border:1px solid var(--border-md);background:transparent;font-size:13px;cursor:pointer;color:var(--text-2);font-family:var(--font);transition:all .15s}
+  .toggle-btn.sel{background:var(--coral-light);border-color:var(--coral);color:var(--coral-dark);font-weight:500}
+  .plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:500px){.plan-grid{grid-template-columns:1fr}}
+  .plan-card{border:1px solid var(--border-md);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:4px}
+  .plan-card:hover,.plan-card.sel{border-color:var(--coral);background:var(--coral-light)}
+  .plan-card.sel .plan-name{color:var(--coral-dark)}
+  .plan-name{font-size:14px;font-weight:500;color:var(--text)}
+  .plan-desc{font-size:11px;color:var(--text-3);line-height:1.4}
+  .plan-price{font-size:17px;font-weight:700;color:var(--coral);margin-top:8px}
+  .info-banner{background:var(--teal-light);border:1px solid #5DCAA5;border-radius:var(--radius-lg);padding:14px 18px;display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+  .info-text{font-size:13px;color:var(--teal);line-height:1.6}
+  .form-btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+  .btn-back{padding:10px 22px;border-radius:var(--radius);border:1px solid var(--border-md);background:transparent;font-size:14px;cursor:pointer;color:var(--text-2);font-family:var(--font);transition:all .15s}
+  .btn-back:hover{background:var(--bg)}
+  .btn-next{padding:10px 28px;border-radius:var(--radius);border:none;background:var(--coral);color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s}
+  .btn-next:hover{opacity:.88}
+  .success-box{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:52px 32px;text-align:center;display:none}
+  .success-icon-wrap{width:64px;height:64px;border-radius:50%;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 18px}
+  .success-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:10px}
+  .success-desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:24px}
+
+  /* JSON viewer */
+  .json-viewer{background:#1A1A1A;border-radius:var(--radius-lg);padding:20px;font-size:12px;line-height:1.7;overflow-x:auto;color:#E8E8E8;font-family:'Courier New',monospace;max-height:500px;overflow-y:auto;white-space:pre}
+  .json-key{color:#F0997B}
+  .json-str{color:#A5D6A7}
+  .json-num{color:#90CAF9}
+  .json-bool{color:#CE93D8}
+  .json-toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+  .json-toolbar span{font-size:13px;color:var(--text-2);flex:1}
+
+  /* ── DETAIL PAGE ── */
+  .detail-wrap{max-width:860px;margin:0 auto;padding:28px 24px 56px}
+  .detail-hero{border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px;position:relative}
+  .detail-hero-thumb{width:100%;aspect-ratio:21/9;display:flex;align-items:center;justify-content:center;font-size:88px}
+  .detail-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 0%,transparent 55%)}
+  .detail-hero-info{position:absolute;bottom:0;left:0;right:0;padding:24px 28px}
+  .detail-hero-info .badge{margin-bottom:10px}
+  .detail-hero-title{font-size:26px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:6px;text-shadow:0 1px 4px rgba(0,0,0,.3)}
+  .detail-hero-tagline{font-size:14px;color:rgba(255,255,255,.85)}
+  .detail-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+  @media(max-width:760px){.detail-grid{grid-template-columns:1fr}}
+  .detail-main{}
+  .detail-section{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:22px 24px;margin-bottom:14px}
+  .detail-sec-title{font-size:13px;font-weight:500;color:var(--coral);letter-spacing:.6px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .detail-sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+  .detail-body{font-size:14px;color:var(--text-2);line-height:1.8;white-space:pre-wrap}
+  .detail-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:480px){.detail-meta-grid{grid-template-columns:1fr}}
+  .detail-meta-item{display:flex;gap:10px;align-items:flex-start}
+  .detail-meta-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+  .detail-meta-label{font-size:11px;color:var(--text-3);margin-bottom:2px}
+  .detail-meta-val{font-size:14px;color:var(--text);font-weight:500;line-height:1.4}
+  .detail-tags{display:flex;flex-wrap:wrap;gap:6px}
+  .detail-tag{font-size:12px;padding:4px 10px;border-radius:20px;background:var(--bg);border:1px solid var(--border-md);color:var(--text-2)}
+  .detail-sidebar{}
+  .detail-cta{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px;text-align:center}
+  .detail-price-big{font-size:28px;font-weight:700;color:var(--coral);margin-bottom:4px}
+  .detail-price-big.free{color:var(--teal)}
+  .detail-price-sub{font-size:12px;color:var(--text-3);margin-bottom:16px}
+  .btn-reg-big{display:block;width:100%;padding:13px;border-radius:var(--radius-lg);border:none;background:var(--coral);color:#fff;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s;margin-bottom:10px}
+  .btn-reg-big:hover{opacity:.88}
+  .btn-reg-outline{display:block;width:100%;padding:11px;border-radius:var(--radius-lg);border:1px solid var(--border-md);background:transparent;color:var(--text-2);font-size:14px;cursor:pointer;font-family:var(--font);transition:all .15s}
+  .btn-reg-outline:hover{background:var(--bg);border-color:var(--coral);color:var(--coral)}
+  .detail-deadline{background:var(--coral-light);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--coral-dark);display:flex;align-items:center;gap:8px}
+  .detail-quota{background:var(--teal-light);border-radius:var(--radius);padding:10px 14px;margin-top:10px;font-size:13px;color:var(--teal);display:flex;align-items:center;gap:8px}
+  .detail-organizer{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:14px}
+  .org-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .org-avatar{width:44px;height:44px;border-radius:50%;background:var(--coral-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .org-name{font-size:14px;font-weight:500;color:var(--text)}
+  .org-contact{font-size:12px;color:var(--text-3);margin-top:2px}
+  .contact-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);padding:6px 0;border-bottom:1px solid var(--border)}
+  .contact-row:last-child{border-bottom:none}
+  .contact-row a{color:var(--coral);text-decoration:none}
+  .contact-row a:hover{text-decoration:underline}
+  .related-section{margin-top:32px}
+  .related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:14px}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- ADMIN BAR -->
+<div id="admin-bar">
+  <strong>🗄 資料庫管理</strong>
+  <span id="db-count-bar">載入中…</span>
+  <button onclick="showView('json')">查看 JSON</button>
+  <button onclick="exportJSON()">匯出 JSON</button>
+  <button onclick="importJSON()">匯入 JSON</button>
+  <button class="danger" onclick="clearDB()">清除資料</button>
+</div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo" onclick="showView('home')">活動<span>廣場</span></div>
+  <nav class="header-nav">
+    <button class="btn-ghost" onclick="showView('home')">首頁</button>
+    <button class="btn-ghost" onclick="showView('json')">📊 資料庫</button>
+    <button class="btn-primary" onclick="showView('form')">＋ 刊登活動</button>
+  </nav>
+</header>
+
+<!-- ========== HOME ========== -->
+<div id="view-home" class="view active">
+  <section class="hero">
+    <div class="hero-badge">🎉 台灣最大活動資訊平台</div>
+    <h1>找到你最感興趣的活動</h1>
+    <p>精選全台展覽、講座、工作坊與節慶活動，每天更新</p>
+    <div class="search-wrap">
+      <input type="text" id="search-input" placeholder="搜尋活動名稱、地點、主題…" oninput="renderHome()" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="btn-primary" onclick="doSearch()">搜尋</button>
+    </div>
+  </section>
+
+  <div class="filter-bar">
+    <span class="filter-label">分類：</span>
+    <button class="tag active" onclick="setFilter(this,'')">全部</button>
+    <button class="tag" onclick="setFilter(this,'展覽')">展覽</button>
+    <button class="tag" onclick="setFilter(this,'講座')">講座</button>
+    <button class="tag" onclick="setFilter(this,'工作坊')">工作坊</button>
+    <button class="tag" onclick="setFilter(this,'音樂演出')">音樂</button>
+    <button class="tag" onclick="setFilter(this,'美食市集')">美食</button>
+    <button class="tag" onclick="setFilter(this,'親子活動')">親子</button>
+    <button class="tag" onclick="setFilter(this,'online')">線上</button>
+    <button class="tag" onclick="setFilter(this,'free')">免費</button>
+  </div>
+
+  <div class="main-wrap">
+    <div class="content-grid">
+      <div>
+        <div class="section-hd">
+          <span class="section-title">✨ 精選推薦</span>
+        </div>
+        <div id="featured-section" class="featured-grid" style="margin-bottom:28px"></div>
+
+        <div class="section-hd">
+          <span class="section-title">📅 近期活動</span>
+          <span id="event-count" style="font-size:13px;color:var(--text-3)"></span>
+        </div>
+        <div id="cards-grid" class="cards-grid"></div>
+
+        <div class="submit-banner">
+          <div>
+            <h3>想讓更多人看見你的活動？</h3>
+            <p>免費刊登，送出後立即寫入資料庫上架</p>
+          </div>
+          <button class="btn-white" onclick="showView('form')">立即刊登 →</button>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="ad-zone">
+          <p>廣告合作</p>
+          <div class="ad-inner">你的廣告在此 · 280 × 90</div>
+        </div>
+        <div class="s-card">
+          <div class="s-title">⏰ 即將截止報名</div>
+          <div id="deadline-list"></div>
+        </div>
+        <div class="s-card">
+          <div class="s-title">📍 熱門地區</div>
+          <div class="region-tags">
+            <button class="tag active" style="font-size:12px" onclick="setFilter(this,'台北市')">台北</button>
+            <button class="tag" style="font-size:12px" onclick="setFilter(this,'新北市')">新北</button>
+            <button class="tag" style="font-size:12px" onclick="setFilter(this,'桃園市')">桃園</button>
+            <button class="tag" style="font-size:12px" onclick="setFilter(this,'台中市')">台中</button>
+            <button class="tag" style="font-size:12px" onclick="setFilter(this,'台南市')">台南</button>
+            <button class="tag" style="font-size:12px" onclick="setFilter(this,'高雄市')">高雄</button>
+          </div>
+        </div>
+        <div class="s-card">
+          <div class="s-title">📊 資料庫統計</div>
+          <div class="db-stats">
+            <div class="stat-box"><div class="stat-label">總活動數</div><div class="stat-val" id="stat-total">0</div></div>
+            <div class="stat-box"><div class="stat-label">本月新增</div><div class="stat-val accent" id="stat-new">0</div></div>
+            <div class="stat-box"><div class="stat-label">免費活動</div><div class="stat-val" id="stat-free">0</div></div>
+            <div class="stat-box"><div class="stat-label">線上活動</div><div class="stat-val" id="stat-online">0</div></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-links">
+      <a href="#">關於我們</a><a href="#">刊登活動</a><a href="#">廣告合作</a>
+      <a href="#">使用條款</a><a href="#">隱私政策</a><a href="#">聯絡我們</a>
+    </div>
+    <div>活動廣場 © 2025 · 讓每一個活動被看見</div>
+  </footer>
+</div>
+
+<!-- ========== DETAIL VIEW ========== -->
+<div id="view-detail" class="view">
+  <div class="detail-wrap">
+    <button class="back-btn" onclick="showView('home')" style="margin-bottom:20px">← 返回活動列表</button>
+
+    <div class="detail-hero" id="detail-hero">
+      <div class="detail-hero-thumb" id="detail-thumb"></div>
+      <div class="detail-hero-overlay"></div>
+      <div class="detail-hero-info">
+        <div id="detail-badge"></div>
+        <div class="detail-hero-title" id="detail-title"></div>
+        <div class="detail-hero-tagline" id="detail-tagline"></div>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-main">
+        <div class="detail-section">
+          <div class="detail-sec-title">活動資訊</div>
+          <div class="detail-meta-grid" id="detail-meta-grid"></div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-sec-title">活動介紹</div>
+          <div class="detail-body" id="detail-desc"></div>
+        </div>
+        <div class="detail-section" id="detail-notes-section" style="display:none">
+          <div class="detail-sec-title">注意事項</div>
+          <div class="detail-body" id="detail-notes"></div>
+        </div>
+        <div class="detail-section" id="detail-tags-section" style="display:none">
+          <div class="detail-sec-title">活動標籤</div>
+          <div class="detail-tags" id="detail-tags"></div>
+        </div>
+        <div class="related-section">
+          <div class="section-hd">
+            <span class="section-title">🔍 相關活動</span>
+          </div>
+          <div class="related-grid" id="related-grid"></div>
+        </div>
+      </div>
+
+      <div class="detail-sidebar">
+        <div class="detail-cta">
+          <div class="detail-price-big" id="detail-price"></div>
+          <div class="detail-price-sub" id="detail-ticket"></div>
+          <div id="detail-deadline-box"></div>
+          <button class="btn-reg-big" id="detail-reg-btn" onclick="handleReg()">立即報名</button>
+          <button class="btn-reg-outline" onclick="shareEvent()">📤 分享活動</button>
+          <div id="detail-quota-box"></div>
+        </div>
+
+        <div class="detail-organizer">
+          <div class="detail-sec-title" style="margin-bottom:12px">主辦方</div>
+          <div class="org-row">
+            <div class="org-avatar" id="detail-org-avatar"></div>
+            <div>
+              <div class="org-name" id="detail-org-name"></div>
+              <div class="org-contact" id="detail-org-sub"></div>
+            </div>
+          </div>
+          <div id="detail-contacts"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== JSON VIEWER ========== -->
+<div id="view-json" class="view">
+  <div style="max-width:960px;margin:0 auto;padding:28px 20px 56px">
+    <button class="back-btn" onclick="showView('home')">← 返回首頁</button>
+    <div class="page-title" style="margin-bottom:4px">🗄 JSON 資料庫</div>
+    <p style="font-size:13px;color:var(--text-2);margin-bottom:20px">活動資料以 JSON 格式儲存在瀏覽器 <code style="background:var(--bg);padding:2px 6px;border-radius:4px">localStorage</code>，key 為 <code style="background:var(--bg);padding:2px 6px;border-radius:4px">activityDB</code>。可匯出為 .json 檔案整合至後端系統。</p>
+
+    <div class="form-card" style="margin-bottom:16px">
+      <div class="json-toolbar">
+        <span id="json-meta">載入中…</span>
+        <button class="btn-ghost" onclick="refreshJSON()" style="font-size:12px;padding:5px 12px">🔄 重新整理</button>
+        <button class="btn-ghost" onclick="exportJSON()" style="font-size:12px;padding:5px 12px">⬇ 匯出 .json</button>
+        <button class="btn-primary" onclick="showView('form')" style="font-size:12px;padding:6px 14px">＋ 新增活動</button>
+      </div>
+      <div class="json-viewer" id="json-viewer">載入中…</div>
+    </div>
+
+    <div class="form-card">
+      <div class="sec-label">欄位結構說明（Schema）</div>
+      <div class="json-viewer"><span class="json-key">"id"</span>: <span class="json-str">"ev_1716000000000"</span>       // 唯一 ID（時間戳）
+<span class="json-key">"name"</span>: <span class="json-str">"活動名稱"</span>
+<span class="json-key">"category"</span>: <span class="json-str">"展覽 | 講座 | 工作坊 | 音樂演出 | 美食市集 | 親子活動 | 運動健身 | 其他"</span>
+<span class="json-key">"tagline"</span>: <span class="json-str">"標語"</span>
+<span class="json-key">"description"</span>: <span class="json-str">"詳細說明"</span>
+<span class="json-key">"notes"</span>: <span class="json-str">"注意事項"</span>
+<span class="json-key">"emoji"</span>: <span class="json-str">"🎨"</span>             // 封面圖示
+<span class="json-key">"color"</span>: <span class="json-str">"coral-light"</span>    // 封面背景色（CSS 變數名稱）
+<span class="json-key">"mode"</span>: <span class="json-str">"inperson | online | hybrid"</span>
+<span class="json-key">"dateStart"</span>: <span class="json-str">"2025-06-01"</span>
+<span class="json-key">"dateEnd"</span>: <span class="json-str">"2025-06-02"</span>
+<span class="json-key">"timeStart"</span>: <span class="json-str">"09:00"</span>
+<span class="json-key">"timeEnd"</span>: <span class="json-str">"17:00"</span>
+<span class="json-key">"venue"</span>: <span class="json-str">"場地名稱"</span>
+<span class="json-key">"city"</span>: <span class="json-str">"台北市"</span>
+<span class="json-key">"district"</span>: <span class="json-str">"信義區"</span>
+<span class="json-key">"address"</span>: <span class="json-str">"詳細地址"</span>
+<span class="json-key">"mapUrl"</span>: <span class="json-str">"https://maps.google.com/..."</span>
+<span class="json-key">"platform"</span>: <span class="json-str">"Zoom"</span>           // 線上活動平台
+<span class="json-key">"onlineUrl"</span>: <span class="json-str">"https://..."</span>
+<span class="json-key">"isFree"</span>: <span class="json-bool">true</span>
+<span class="json-key">"ticketName"</span>: <span class="json-str">"一般票"</span>
+<span class="json-key">"price"</span>: <span class="json-num">500</span>
+<span class="json-key">"quota"</span>: <span class="json-num">50</span>
+<span class="json-key">"deadline"</span>: <span class="json-str">"2025-05-28"</span>
+<span class="json-key">"regMethod"</span>: <span class="json-str">"本站報名 | 外部連結 | Email 報名 | 電話報名 | 現場報名"</span>
+<span class="json-key">"regUrl"</span>: <span class="json-str">"https://..."</span>
+<span class="json-key">"tags"</span>: [<span class="json-str">"藝術"</span>, <span class="json-str">"設計"</span>]
+<span class="json-key">"organizer"</span>: <span class="json-str">"主辦單位"</span>
+<span class="json-key">"contactName"</span>: <span class="json-str">"聯絡人"</span>
+<span class="json-key">"contactTel"</span>: <span class="json-str">"02-1234-5678"</span>
+<span class="json-key">"contactEmail"</span>: <span class="json-str">"email@example.com"</span>
+<span class="json-key">"orgWeb"</span>: <span class="json-str">"https://..."</span>
+<span class="json-key">"orgSns"</span>: <span class="json-str">"@handle"</span>
+<span class="json-key">"plan"</span>: <span class="json-str">"basic | featured | premium"</span>
+<span class="json-key">"status"</span>: <span class="json-str">"published | pending"</span>
+<span class="json-key">"createdAt"</span>: <span class="json-str">"2025-05-17T10:30:00.000Z"</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FORM ========== -->
+<div id="view-form" class="view">
+  <div class="form-page">
+    <button class="back-btn" onclick="showView('home')">← 返回首頁</button>
+    <div class="page-title">刊登活動申請</div>
+    <div class="page-desc">填寫以下資訊，送出後立即寫入 JSON 資料庫並顯示在首頁。<span class="req-note">*</span> 為必填。</div>
+
+    <div class="steps-bar">
+      <div class="step-item"><div class="step-dot active" id="dot1">1</div><div class="step-lbl active" id="lbl1">基本資訊</div></div>
+      <div class="step-item"><div class="step-dot" id="dot2">2</div><div class="step-lbl" id="lbl2">時間地點</div></div>
+      <div class="step-item"><div class="step-dot" id="dot3">3</div><div class="step-lbl" id="lbl3">費用報名</div></div>
+      <div class="step-item"><div class="step-dot" id="dot4">4</div><div class="step-lbl" id="lbl4">聯絡送出</div></div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="fstep1">
+      <div class="form-card">
+        <div class="sec-label">活動名稱與類別</div>
+        <div class="field">
+          <label>活動名稱 <span class="req">*</span></label>
+          <input type="text" id="ev-name" placeholder="請輸入完整活動名稱（最多40字）" oninput="countChars('ev-name','nc',40)">
+          <div class="char-count" id="nc">0 / 40 字</div>
+          <div class="err-msg" id="ev-name-err">請輸入活動名稱</div>
+        </div>
+        <div class="field">
+          <label>活動類別 <span class="req">*</span></label>
+          <div class="pill-group" id="cat-group">
+            <label class="pill" onclick="selPill(this,'cat-group')"><input type="radio" name="cat">展覽</label>
+            <label class="pill" onclick="selPill(this,'cat-group')"><input type="radio" name="cat">講座</label>
+            <label class="pill" onclick="selPill(this,'cat-group')"><input type="radio" name="cat">工作坊</label>
+            <label class="pill" onclick="selPill(this,'cat-group')"><input type="radio" name="cat">音樂演出</label>
+            <label class="pill" onclick="selPill(this,'cat-group')"><input type="radio" name="cat">美食市集</label>
+            <label class="pill" onclick="selPill(this,'cat-group')"><input type="radio" name="cat">親子活動</label>
+            <label class="pill" onclick="selPill(this,'cat-group')"><input type="radio" name="cat">運動健身</label>
+            <label class="pill" onclick="selPill(this,'cat-group')"><input type="radio" name="cat">其他</label>
+          </div>
+          <div class="err-msg" id="cat-err">請選擇活動類別</div>
+        </div>
+        <div class="field">
+          <label>活動標語 <span class="hint">選填</span></label>
+          <input type="text" id="ev-tagline" placeholder="一句話吸引人報名" oninput="countChars('ev-tagline','tc',60)">
+          <div class="char-count" id="tc">0 / 60 字</div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="sec-label">活動說明</div>
+        <div class="field">
+          <label>活動介紹 <span class="req">*</span><span class="hint">至少20字</span></label>
+          <textarea id="ev-desc" rows="5" placeholder="詳細說明活動內容、特色、亮點…" oninput="countChars('ev-desc','dc',500)"></textarea>
+          <div class="char-count" id="dc">0 / 500 字</div>
+          <div class="err-msg" id="ev-desc-err">請輸入活動介紹（至少20字）</div>
+        </div>
+        <div class="field">
+          <label>注意事項 <span class="hint">選填</span></label>
+          <textarea id="ev-notes" rows="3" placeholder="退票規則、服裝要求、攜帶物品等…"></textarea>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="sec-label">封面圖片</div>
+
+        <!-- GitHub Token 設定 -->
+        <div class="field" id="gh-token-field">
+          <label>GitHub Token <span class="hint">選填，用於同步圖片至 umoo125.github.io/umoo</span></label>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+            <button type="button" onclick="saveGhToken()" class="btn-primary" style="white-space:nowrap;padding:10px 14px;font-size:13px">儲存</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:5px">Token 僅存於本機 localStorage，不會傳送至第三方。需要 <code>repo</code> 權限。<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener" style="color:var(--coral)">申請 Token →</a></div>
+          <div id="gh-token-status" style="font-size:12px;margin-top:6px"></div>
+        </div>
+
+        <!-- Upload zone -->
+        <div class="field">
+          <label>上傳封面圖片 <span class="hint">JPG / PNG / WebP，建議 1200×630px</span></label>
+          <input type="file" id="cover-file" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" onchange="onCoverFileChange(event)">
+          <div id="cover-upload-zone" class="upload-zone" onclick="document.getElementById('cover-file').click()" ondragover="event.preventDefault()" ondrop="onCoverDrop(event)">
+            <div class="upload-icon">🖼</div>
+            <div class="upload-text"><strong>點擊上傳</strong>或拖曳圖片至此</div>
+            <div class="upload-note">圖片立即儲存為封面；有設定 Token 時同步上傳至 GitHub Pages</div>
+          </div>
+          <!-- Preview -->
+          <div id="cover-preview-wrap" style="display:none;margin-top:10px;position:relative">
+            <img id="cover-preview-img" style="width:100%;border-radius:var(--radius-lg);max-height:220px;object-fit:cover;display:block">
+            <button type="button" onclick="clearCover()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;line-height:1">✕</button>
+            <div id="cover-filename" style="font-size:11px;color:var(--text-3);margin-top:4px"></div>
+          </div>
+          <!-- Upload progress -->
+          <div id="cover-upload-progress" style="display:none;margin-top:10px">
+            <div style="background:var(--bg);border-radius:var(--radius);height:6px;overflow:hidden">
+              <div id="cover-progress-bar" style="height:100%;background:var(--coral);width:0%;transition:width .3s;border-radius:var(--radius)"></div>
+            </div>
+            <div id="cover-progress-text" style="font-size:12px;color:var(--text-3);margin-top:4px">準備上傳…</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-btn-row">
+        <button class="btn-next" onclick="goStep(2)">下一步：時間與地點 →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="fstep2" style="display:none">
+      <div class="form-card">
+        <div class="sec-label">活動形式與日期</div>
+        <div class="field">
+          <label>活動形式 <span class="req">*</span></label>
+          <div class="toggle-group">
+            <button class="toggle-btn sel" id="tog-inperson" onclick="setMode('inperson')">實體活動</button>
+            <button class="toggle-btn" id="tog-online" onclick="setMode('online')">線上活動</button>
+            <button class="toggle-btn" id="tog-hybrid" onclick="setMode('hybrid')">混合</button>
+          </div>
+        </div>
+        <div class="field field-row">
+          <div>
+            <label>開始日期 <span class="req">*</span></label>
+            <input type="date" id="ev-start">
+            <div class="err-msg" id="ev-start-err">請選擇開始日期</div>
+          </div>
+          <div>
+            <label>結束日期 <span class="hint">多日活動</span></label>
+            <input type="date" id="ev-end">
+          </div>
+        </div>
+        <div class="field field-row">
+          <div>
+            <label>開始時間 <span class="req">*</span></label>
+            <input type="text" id="ev-time-s" placeholder="09:30">
+            <div class="err-msg" id="ev-time-s-err">請填寫開始時間</div>
+          </div>
+          <div>
+            <label>結束時間 <span class="hint">選填</span></label>
+            <input type="text" id="ev-time-e" placeholder="17:00">
+          </div>
+        </div>
+      </div>
+      <div class="form-card" id="venue-card">
+        <div class="sec-label">實體場地</div>
+        <div class="field">
+          <label>場地名稱 <span class="req">*</span></label>
+          <input type="text" id="ev-venue" placeholder="台北世貿一館">
+          <div class="err-msg" id="ev-venue-err">請輸入場地名稱</div>
+        </div>
+        <div class="field field-row">
+          <div>
+            <label>縣市 <span class="req">*</span></label>
+            <select id="ev-city">
+              <option value="">請選擇…</option>
+              <option>台北市</option><option>新北市</option><option>桃園市</option>
+              <option>台中市</option><option>台南市</option><option>高雄市</option>
+              <option>基隆市</option><option>新竹市</option><option>新竹縣</option>
+              <option>苗栗縣</option><option>彰化縣</option><option>南投縣</option>
+              <option>雲林縣</option><option>嘉義市</option><option>嘉義縣</option>
+              <option>屏東縣</option><option>宜蘭縣</option><option>花蓮縣</option>
+              <option>台東縣</option><option>澎湖縣</option><option>金門縣</option><option>連江縣</option>
+            </select>
+          </div>
+          <div>
+            <label>行政區 <span class="hint">選填</span></label>
+            <input type="text" id="ev-district" placeholder="信義區">
+          </div>
+        </div>
+        <div class="field">
+          <label>詳細地址 <span class="hint">選填</span></label>
+          <input type="text" id="ev-addr" placeholder="信義路五段7號">
+        </div>
+        <div class="field">
+          <label>Google Maps 連結 <span class="hint">選填</span></label>
+          <input type="url" id="ev-map" placeholder="https://maps.google.com/…">
+        </div>
+      </div>
+      <div class="form-card" id="online-card" style="display:none">
+        <div class="sec-label">線上活動資訊</div>
+        <div class="field">
+          <label>直播平台</label>
+          <input type="text" id="ev-platform" placeholder="Zoom、Google Meet、YouTube">
+        </div>
+        <div class="field">
+          <label>活動連結</label>
+          <input type="url" id="ev-link" placeholder="https://…">
+        </div>
+      </div>
+      <div class="form-btn-row">
+        <button class="btn-back" onclick="goStep(1)">← 上一步</button>
+        <button class="btn-next" onclick="goStep(3)">下一步：費用與報名 →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="fstep3" style="display:none">
+      <div class="form-card">
+        <div class="sec-label">票價設定</div>
+        <div class="field">
+          <label>費用類型 <span class="req">*</span></label>
+          <div class="toggle-group">
+            <button class="toggle-btn sel" id="tog-free" onclick="setFee('free')">免費</button>
+            <button class="toggle-btn" id="tog-paid-btn" onclick="setFee('paid')">付費</button>
+          </div>
+        </div>
+        <div id="paid-fields" style="display:none">
+          <div class="field field-row">
+            <div>
+              <label>票種名稱</label>
+              <input type="text" id="ev-ticket-name" placeholder="一般票、早鳥票">
+            </div>
+            <div>
+              <label>票價（NT$）<span class="req">*</span></label>
+              <input type="number" id="ev-price" placeholder="0" min="0">
+            </div>
+          </div>
+          <div class="field">
+            <label>報名名額 <span class="hint">選填・不填代表無限制</span></label>
+            <input type="number" id="ev-quota" placeholder="50" min="1">
+          </div>
+        </div>
+        <div class="field">
+          <label>報名截止日 <span class="hint">選填</span></label>
+          <input type="date" id="ev-deadline">
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="sec-label">報名方式</div>
+        <div class="field">
+          <label>主要報名方式 <span class="req">*</span></label>
+          <div class="pill-group" id="reg-group">
+            <label class="pill" onclick="selPill(this,'reg-group')"><input type="radio" name="reg">本站報名</label>
+            <label class="pill" onclick="selPill(this,'reg-group')"><input type="radio" name="reg">外部連結</label>
+            <label class="pill" onclick="selPill(this,'reg-group')"><input type="radio" name="reg">Email 報名</label>
+            <label class="pill" onclick="selPill(this,'reg-group')"><input type="radio" name="reg">電話報名</label>
+            <label class="pill" onclick="selPill(this,'reg-group')"><input type="radio" name="reg">現場報名</label>
+          </div>
+          <div class="err-msg" id="reg-err">請選擇報名方式</div>
+        </div>
+        <div class="field">
+          <label>外部報名連結 <span class="hint">選填</span></label>
+          <input type="url" id="ev-reg-url" placeholder="https://www.accupass.com/…">
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="sec-label">活動標籤</div>
+        <div class="field">
+          <label>選擇相關標籤 <span class="hint">可多選</span></label>
+          <div class="pill-group" id="tags-group">
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">藝術</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">設計</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">科技</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">音樂</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">美食</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">旅遊</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">健康</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">教育</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">商業</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">親子</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">戶外</label>
+            <label class="pill" onclick="event.preventDefault();togPill(this)"><input type="checkbox">永續</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-btn-row">
+        <button class="btn-back" onclick="goStep(2)">← 上一步</button>
+        <button class="btn-next" onclick="goStep(4)">下一步：聯絡資訊 →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div id="fstep4" style="display:none">
+      <div class="form-card">
+        <div class="sec-label">主辦方資訊</div>
+        <div class="field">
+          <label>主辦單位名稱 <span class="req">*</span></label>
+          <input type="text" id="org-name" placeholder="○○文化基金會（個人主辦請填姓名）">
+          <div class="err-msg" id="org-name-err">請輸入主辦單位名稱</div>
+        </div>
+        <div class="field field-row">
+          <div>
+            <label>聯絡人姓名 <span class="req">*</span></label>
+            <input type="text" id="contact-name" placeholder="負責人姓名">
+            <div class="err-msg" id="contact-name-err">請輸入聯絡人姓名</div>
+          </div>
+          <div>
+            <label>聯絡電話 <span class="req">*</span></label>
+            <input type="tel" id="contact-tel" placeholder="02-1234-5678">
+            <div class="err-msg" id="contact-tel-err">請輸入聯絡電話</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>聯絡 Email <span class="req">*</span></label>
+          <input type="email" id="contact-email" placeholder="example@email.com">
+          <div class="err-msg" id="contact-email-err">請輸入有效的 Email</div>
+        </div>
+        <div class="field field-row">
+          <div>
+            <label>主辦方網站 <span class="hint">選填</span></label>
+            <input type="url" id="org-web" placeholder="https://…">
+          </div>
+          <div>
+            <label>社群帳號 <span class="hint">選填</span></label>
+            <input type="text" id="org-sns" placeholder="@yourpage">
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="sec-label">刊登方案</div>
+        <div class="plan-grid">
+          <div class="plan-card sel" id="plan-basic" onclick="selPlan('basic')">
+            <div class="plan-name">基本刊登</div>
+            <div class="plan-desc">標準列表顯示，立即上架</div>
+            <div class="plan-price">免費</div>
+          </div>
+          <div class="plan-card" id="plan-featured" onclick="selPlan('featured')">
+            <div class="plan-name">精選推薦</div>
+            <div class="plan-desc">首頁大圖 + 加強曝光</div>
+            <div class="plan-price">NT$990 <span style="font-size:12px;font-weight:400;color:var(--text-3)">/ 週</span></div>
+          </div>
+          <div class="plan-card" id="plan-premium" onclick="selPlan('premium')">
+            <div class="plan-name">頂級置頂</div>
+            <div class="plan-desc">全站置頂 + 電子報推薦</div>
+            <div class="plan-price">NT$2,490 <span style="font-size:12px;font-weight:400;color:var(--text-3)">/ 週</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="info-banner">
+        <span style="font-size:16px;flex-shrink:0">✅</span>
+        <div class="info-text">送出後活動資料將即時寫入 JSON 資料庫，並立即顯示在首頁。可至「資料庫」頁面查看原始 JSON 或匯出檔案。</div>
+      </div>
+      <div class="form-btn-row">
+        <button class="btn-back" onclick="goStep(3)">← 上一步</button>
+        <button class="btn-next" onclick="submitForm()">送出並上架 ✓</button>
+      </div>
+    </div>
+
+    <div class="success-box" id="success-box">
+      <div class="success-icon-wrap">🎉</div>
+      <div class="success-title">活動已成功上架！</div>
+      <div class="success-desc" id="success-desc">活動資料已寫入 JSON 資料庫，現在可以在首頁看到你的活動。</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-next" onclick="showView('home')">← 回首頁查看</button>
+        <button class="btn-back" onclick="showView('json');refreshJSON()">查看 JSON 資料</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════
+   DATABASE (localStorage)
+══════════════════════ */
+var DB_KEY = 'activityDB';
+var COLORS = ['coral-light','teal-light','blue-light','purple-light','green-light','amber-light','red-light'];
+
+function dbGetAll() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function dbInsert(ev) {
+  var list = dbGetAll();
+  list.unshift(ev);
+  localStorage.setItem(DB_KEY, JSON.stringify(list, null, 2));
+}
+function dbClear() { localStorage.removeItem(DB_KEY); }
+
+function exportJSON() {
+  var data = localStorage.getItem(DB_KEY) || '[]';
+  var blob = new Blob([data], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'activities_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  toast('✅ JSON 已下載');
+}
+function importJSON() {
+  var input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = function(e) {
+    var file = e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        var data = JSON.parse(ev.target.result);
+        if (!Array.isArray(data)) throw new Error();
+        localStorage.setItem(DB_KEY, JSON.stringify(data, null, 2));
+        toast('✅ 已匯入 ' + data.length + ' 筆活動');
+        renderHome(); updateAdminBar();
+      } catch(e) { toast('❌ JSON 格式錯誤'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+function clearDB() {
+  if (!confirm('確定清除所有活動資料？此動作無法復原。')) return;
+  dbClear(); toast('🗑 資料庫已清除');
+  renderHome(); updateAdminBar();
+}
+
+/* ══════════════════════
+   TOAST
+══════════════════════ */
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+function updateAdminBar() {
+  var n = dbGetAll().length;
+  var el = document.getElementById('db-count-bar');
+  if (el) el.textContent = '共 ' + n + ' 筆活動';
+}
+
+/* ══════════════════════
+   VIEW SWITCHING
+══════════════════════ */
+function showView(v) {
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('view-' + v).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (v === 'form') { resetForm(); var t=getGhToken(); if(t){var el=document.getElementById('gh-token');if(el)el.value=t;setGhStatus('✅ Token 已設定','ok');} }
+  if (v === 'home') renderHome();
+  if (v === 'json') refreshJSON();
+}
+
+/* ══════════════════════
+   DETAIL PAGE
+══════════════════════ */
+var currentEvent = null;
+
+function showDetail(id) {
+  var list = dbGetAll();
+  var e = null;
+  for (var i = 0; i < list.length; i++) { if (list[i].id === id) { e = list[i]; break; } }
+  if (!e) return;
+  currentEvent = e;
+
+  document.querySelectorAll('.view').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('view-detail').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  // Hero
+  var thumb = document.getElementById('detail-thumb');
+  thumb.style.background = getBg(e);
+  if (e.coverImage) {
+    thumb.innerHTML = '<img src="' + escHtml(e.coverImage) + '" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentNode.innerHTML=\'' + escHtml(e.emoji||'🎪') + '\';this.parentNode.style.fontSize=\'88px\'">';
+    thumb.style.padding = '0';
+  } else {
+    thumb.innerHTML = escHtml(e.emoji || '🎪');
+    thumb.style.padding = '';
+  }
+
+  document.getElementById('detail-badge').innerHTML = getBadge(e);
+  document.getElementById('detail-title').textContent = e.name || '';
+  document.getElementById('detail-tagline').textContent = e.tagline || '';
+  document.getElementById('detail-tagline').style.display = e.tagline ? '' : 'none';
+
+  // Meta grid
+  var metas = [];
+  if (e.dateStart) {
+    var dateStr = e.dateStart.replace(/-/g,'/');
+    if (e.dateEnd && e.dateEnd !== e.dateStart) dateStr += ' – ' + e.dateEnd.replace(/-/g,'/');
+    metas.push({icon:'📅', label:'活動日期', val: dateStr});
+  }
+  if (e.timeStart) {
+    var timeStr = e.timeStart + (e.timeEnd ? ' – ' + e.timeEnd : '');
+    metas.push({icon:'🕐', label:'活動時間', val: timeStr});
+  }
+  if (e.mode === 'online') {
+    metas.push({icon:'🌐', label:'活動形式', val: '線上活動'});
+    if (e.platform) metas.push({icon:'💻', label:'直播平台', val: e.platform});
+  } else {
+    metas.push({icon:'📍', label:'活動地點', val: [e.venue, e.city && e.district ? e.city+e.district : (e.city||e.district||'')].filter(Boolean).join('・')});
+    if (e.address) metas.push({icon:'🗺', label:'詳細地址', val: e.address});
+  }
+  if (e.category) metas.push({icon:'🏷', label:'活動類別', val: e.category});
+  if (e.regMethod) metas.push({icon:'📝', label:'報名方式', val: e.regMethod});
+  if (e.quota > 0) metas.push({icon:'👥', label:'名額', val: e.quota + ' 人'});
+
+  document.getElementById('detail-meta-grid').innerHTML = metas.map(function(m){
+    return '<div class="detail-meta-item">' +
+      '<div class="detail-meta-icon">' + m.icon + '</div>' +
+      '<div><div class="detail-meta-label">' + m.label + '</div>' +
+      '<div class="detail-meta-val">' + escHtml(m.val) + '</div></div></div>';
+  }).join('');
+
+  // Description
+  document.getElementById('detail-desc').textContent = e.description || '';
+
+  // Notes
+  var notesSection = document.getElementById('detail-notes-section');
+  if (e.notes && e.notes.trim()) {
+    document.getElementById('detail-notes').textContent = e.notes;
+    notesSection.style.display = '';
+  } else { notesSection.style.display = 'none'; }
+
+  // Tags
+  var tagsSection = document.getElementById('detail-tags-section');
+  if (e.tags && e.tags.length) {
+    document.getElementById('detail-tags').innerHTML = e.tags.map(function(t){
+      return '<span class="detail-tag">' + escHtml(t) + '</span>';
+    }).join('');
+    tagsSection.style.display = '';
+  } else { tagsSection.style.display = 'none'; }
+
+  // CTA price
+  var priceEl = document.getElementById('detail-price');
+  var ticketEl = document.getElementById('detail-ticket');
+  if (e.isFree) {
+    priceEl.textContent = '免費參加';
+    priceEl.className = 'detail-price-big free';
+    ticketEl.textContent = '';
+  } else {
+    priceEl.textContent = 'NT$' + Number(e.price||0).toLocaleString();
+    priceEl.className = 'detail-price-big';
+    ticketEl.textContent = e.ticketName ? e.ticketName + '・' + (e.quota > 0 ? '限額 ' + e.quota + ' 人' : '無限額') : '';
+  }
+
+  // Deadline
+  var dlBox = document.getElementById('detail-deadline-box');
+  if (e.deadline) {
+    dlBox.innerHTML = '<div class="detail-deadline">⏰ 報名截止：' + e.deadline.replace(/-/g,'/') + '</div>';
+  } else { dlBox.innerHTML = ''; }
+
+  // Quota reminder
+  var quotaBox = document.getElementById('detail-quota-box');
+  if (e.quota > 0) {
+    quotaBox.innerHTML = '<div class="detail-quota">👥 本活動限額 ' + e.quota + ' 人，手刀報名！</div>';
+  } else { quotaBox.innerHTML = ''; }
+
+  // Reg button
+  var regBtn = document.getElementById('detail-reg-btn');
+  if (e.isFree) { regBtn.textContent = '免費報名 →'; }
+  else { regBtn.textContent = '立即報名 NT$' + Number(e.price||0).toLocaleString() + ' →'; }
+
+  // Organizer
+  document.getElementById('detail-org-avatar').textContent = e.emoji || '🎪';
+  document.getElementById('detail-org-name').textContent = e.organizer || '';
+  document.getElementById('detail-org-sub').textContent = e.contactName ? '聯絡人：' + e.contactName : '';
+
+  var contacts = [];
+  if (e.contactTel) contacts.push('<div class="contact-row">📞 <a href="tel:' + e.contactTel + '">' + escHtml(e.contactTel) + '</a></div>');
+  if (e.contactEmail) contacts.push('<div class="contact-row">✉️ <a href="mailto:' + e.contactEmail + '">' + escHtml(e.contactEmail) + '</a></div>');
+  if (e.orgWeb) contacts.push('<div class="contact-row">🌐 <a href="' + escHtml(e.orgWeb) + '" target="_blank" rel="noopener">官方網站</a></div>');
+  if (e.orgSns) contacts.push('<div class="contact-row">📱 ' + escHtml(e.orgSns) + '</div>');
+  document.getElementById('detail-contacts').innerHTML = contacts.join('');
+
+  // Related events (same category, exclude current)
+  var related = list.filter(function(r){ return r.id !== e.id && r.category === e.category; }).slice(0,4);
+  if (!related.length) related = list.filter(function(r){ return r.id !== e.id; }).slice(0,4);
+  var relatedEl = document.getElementById('related-grid');
+  relatedEl.innerHTML = related.map(function(r){ return makeRelatedCard(r); }).join('');
+}
+
+function makeRelatedCard(e) {
+  var thumbContent = e.coverImage
+    ? '<img src="' + escHtml(e.coverImage) + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML=\'' + escHtml(e.emoji||'🎪') + '\'">'
+    : escHtml(e.emoji||'🎪');
+  return '<div class="card" onclick="showDetail(\'' + escHtml(e.id) + '\')" style="cursor:pointer">' +
+    '<div class="card-thumb" style="background:' + getBg(e) + ';font-size:30px' + (e.coverImage?';padding:0':'') + '">' + thumbContent + '</div>' +
+    '<div class="card-body" style="padding:10px 14px 12px">' +
+      getBadge(e) +
+      '<div class="card-title" style="font-size:13px">' + escHtml(e.name) + '</div>' +
+      '<div class="card-meta"><span>' + fmtDate(e) + '</span></div>' +
+      '<div class="card-footer">' + fmtPrice(e) + '</div>' +
+    '</div></div>';
+}
+
+function handleReg() {
+  if (!currentEvent) return;
+  if (currentEvent.regUrl) {
+    window.open(currentEvent.regUrl, '_blank');
+  } else if (currentEvent.contactEmail) {
+    window.location.href = 'mailto:' + currentEvent.contactEmail + '?subject=活動報名：' + encodeURIComponent(currentEvent.name);
+  } else {
+    toast('📝 請聯絡主辦方報名：' + (currentEvent.contactTel || currentEvent.contactEmail || '詳見聯絡資訊'));
+  }
+}
+
+function shareEvent() {
+  if (!currentEvent) return;
+  var text = '【' + currentEvent.name + '】' + (currentEvent.tagline ? ' ' + currentEvent.tagline : '') +
+             '\n📅 ' + (currentEvent.dateStart||'').replace(/-/g,'/') +
+             (currentEvent.city ? '\n📍 ' + currentEvent.city : '') +
+             '\n\n活動廣場 activitysquare.tw';
+  if (navigator.share) {
+    navigator.share({title: currentEvent.name, text: text}).catch(function(){});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function(){ toast('✅ 活動資訊已複製到剪貼簿'); });
+  } else {
+    toast('✅ 複製活動資訊：' + currentEvent.name);
+  }
+}
+
+/* ══════════════════════
+   HOME RENDER
+══════════════════════ */
+var activeFilter = '';
+
+function setFilter(el, val) {
+  document.querySelectorAll('.filter-bar .tag, .region-tags .tag').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+  activeFilter = val;
+  renderHome();
+}
+
+function getFiltered() {
+  var list = dbGetAll();
+  var q = (document.getElementById('search-input') || {}).value || '';
+  if (q) {
+    q = q.toLowerCase();
+    list = list.filter(function(e){
+      return (e.name||'').toLowerCase().includes(q) ||
+             (e.description||'').toLowerCase().includes(q) ||
+             (e.city||'').toLowerCase().includes(q) ||
+             (e.venue||'').toLowerCase().includes(q);
+    });
+  }
+  if (activeFilter === 'free') list = list.filter(function(e){ return e.isFree; });
+  else if (activeFilter === 'online') list = list.filter(function(e){ return e.mode === 'online'; });
+  else if (activeFilter) list = list.filter(function(e){
+    return (e.category||'').includes(activeFilter) || (e.city||'') === activeFilter;
+  });
+  return list;
+}
+
+function fmtDate(e) {
+  if (!e.dateStart) return '';
+  var d = e.dateStart.slice(5).replace('-','/');
+  if (e.dateEnd && e.dateEnd !== e.dateStart) d += ' – ' + e.dateEnd.slice(5).replace('-','/');
+  return '📅 ' + d;
+}
+function fmtLoc(e) {
+  if (e.mode === 'online') return '🌐 ' + (e.platform || '線上');
+  return e.city ? '📍 ' + e.city : (e.venue ? '📍 ' + e.venue : '');
+}
+function fmtPrice(e) {
+  return e.isFree
+    ? '<span class="price price-free">免費</span>'
+    : '<span class="price">NT$' + Number(e.price||0).toLocaleString() + '</span>';
+}
+function getBadge(e) {
+  if (e.plan === 'featured' || e.plan === 'premium') return '<span class="badge badge-hot">⭐ 精選</span>';
+  if (e.isFree) return '<span class="badge badge-free">免費</span>';
+  if (e.mode === 'online') return '<span class="badge badge-online">線上</span>';
+  return '<span class="badge badge-user">新上架</span>';
+}
+function getBg(e) { return 'var(--' + (e.color || 'coral-light') + ')'; }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function makeCard(e, small) {
+  var eid = escHtml(e.id||'');
+  var thumbContent = e.coverImage
+    ? '<img src="' + escHtml(e.coverImage) + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML=\'' + escHtml(e.emoji||'🎪') + '\'">'
+    : escHtml(e.emoji||'🎪');
+  var thumbStyle = 'background:' + getBg(e) + (small ? ';aspect-ratio:5/2;font-size:30px' : '') + (e.coverImage ? ';padding:0' : '');
+  return '<div class="card' + (small?' side-card':'') + '" onclick="showDetail(\'' + eid + '\')">' +
+    '<div class="card-thumb" style="' + thumbStyle + '">' + thumbContent + '</div>' +
+    '<div class="card-body" style="' + (small?'padding:10px 14px 12px':'') + '">' +
+      getBadge(e) +
+      '<div class="card-title" style="' + (small?'font-size:13px':'') + '">' + escHtml(e.name) + '</div>' +
+      '<div class="card-meta"><span>' + fmtDate(e) + '</span><span>' + fmtLoc(e) + '</span></div>' +
+      (small ? '' : '<div class="card-desc">' + escHtml(e.description||'') + '</div>') +
+      '<div class="card-footer">' + fmtPrice(e) +
+        '<button class="reg-btn" onclick="event.stopPropagation();showDetail(\'' + eid + '\')">查看詳情</button>' +
+      '</div>' +
+    '</div></div>';
+}
+
+function doSearch() {
+  renderHome();
+  var target = document.getElementById('featured-section') || document.getElementById('cards-grid');
+  if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderHome() {
+  try {
+  var all = dbGetAll();
+  var list = getFiltered();
+  updateAdminBar();
+
+  // Stats
+  var now = new Date();
+  var ym = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  setEl('stat-total', all.length);
+  setEl('stat-new', all.filter(function(e){ return (e.createdAt||'').slice(0,7) === ym; }).length);
+  setEl('stat-free', all.filter(function(e){ return e.isFree; }).length);
+  setEl('stat-online', all.filter(function(e){ return e.mode === 'online'; }).length);
+
+  var countEl = document.getElementById('event-count');
+  if (countEl) countEl.textContent = list.length ? '共 ' + list.length + ' 個' : '';
+
+  // Featured
+  var featuredEl = document.getElementById('featured-section');
+  var featured = list.filter(function(e){ return e.plan==='featured'||e.plan==='premium'; }).slice(0,3);
+  if (!featured.length) featured = list.slice(0,3);
+  if (!featured.length) {
+    featuredEl.style.display = 'none';
+  } else {
+    featuredEl.style.display = '';
+    var side = '';
+    for (var i = 1; i < Math.min(3, featured.length); i++) side += makeCard(featured[i], true);
+    featuredEl.innerHTML = makeCard(featured[0], false) + (side ? '<div class="side-cards">' + side + '</div>' : '');
+  }
+
+  // Grid
+  var featIds = featured.map(function(e){ return e.id; });
+  var rest = list.filter(function(e){ return !featIds.includes(e.id); }).slice(0,12);
+  var gridEl = document.getElementById('cards-grid');
+  if (!rest.length && !featured.length) {
+    gridEl.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="e-icon">🔍</div><div>' +
+      (all.length ? '目前無符合條件的活動' :
+       '尚無活動資料。<a href="#" onclick="showView(\'form\');return false;" style="color:var(--coral)">立即刊登第一個活動！</a>') +
+      '</div></div>';
+  } else {
+    gridEl.innerHTML = rest.map(function(e){ return makeCard(e, false); }).join('');
+  }
+
+  // Deadline sidebar
+  var deadlineEl = document.getElementById('deadline-list');
+  var dl = all.filter(function(e){ return e.deadline; })
+              .sort(function(a,b){ return a.deadline.localeCompare(b.deadline); })
+              .slice(0,4);
+  if (!dl.length) {
+    deadlineEl.innerHTML = '<div style="font-size:13px;color:var(--text-3);padding:8px 0">目前無截止日期的活動</div>';
+  } else {
+    deadlineEl.innerHTML = dl.map(function(e){
+      var d = e.deadline.slice(5).replace('-','/');
+      var p = e.isFree ? '免費' : 'NT$' + Number(e.price||0).toLocaleString();
+      return '<div class="list-item" onclick="showDetail(\'' + escHtml(e.id) + '\')" style="cursor:pointer"><div class="list-thumb">' + escHtml(e.emoji||'🎪') + '</div>' +
+        '<div><div class="list-ttl">' + escHtml(e.name) + '</div><div class="list-meta">截止 ' + d + ' ｜ ' + p + '</div></div></div>';
+    }).join('');
+  }
+  } catch(e) { console.error('renderHome error:', e); }
+}
+
+function setEl(id, val) { var el=document.getElementById(id); if(el) el.textContent=val; }
+
+/* ══════════════════════
+   JSON VIEWER
+══════════════════════ */
+function refreshJSON() {
+  var list = dbGetAll();
+  var meta = document.getElementById('json-meta');
+  if (meta) meta.innerHTML = '共 <strong>' + list.length + '</strong> 筆活動資料';
+  var viewer = document.getElementById('json-viewer');
+  if (!viewer) return;
+  if (!list.length) {
+    viewer.textContent = '// 尚無資料。請先刊登活動。';
+    return;
+  }
+  var json = JSON.stringify(list, null, 2);
+  // Syntax highlight
+  json = json
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"([^"\n]+)":/g,'<span class="json-key">"$1"</span>:')
+    .replace(/: "([^"\n]*)"/g,': <span class="json-str">"$1"</span>')
+    .replace(/: (true|false)/g,': <span class="json-bool">$1</span>')
+    .replace(/: (-?\d+\.?\d*)/g,': <span class="json-num">$1</span>');
+  viewer.innerHTML = json;
+}
+
+/* ══════════════════════
+   FORM STEPS
+══════════════════════ */
+var curStep = 1;
+function goStep(n) {
+  if (n > curStep && !validateStep(curStep)) return;
+  document.getElementById('fstep' + curStep).style.display = 'none';
+  curStep = n;
+  document.getElementById('fstep' + n).style.display = '';
+  for (var i = 1; i <= 4; i++) {
+    var dot = document.getElementById('dot'+i), lbl = document.getElementById('lbl'+i);
+    dot.className = 'step-dot' + (i===n?' active':i<n?' done':'');
+    dot.textContent = i < n ? '✓' : i;
+    lbl.className = 'step-lbl' + (i===n?' active':'');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showErr(id, show) { var e=document.getElementById(id); if(e) e.style.display=show?'':'none'; }
+function reqVal(inputId, errId) {
+  var el=document.getElementById(inputId);
+  var ok = el && el.value.trim() !== '';
+  if (el) el.classList.toggle('err', !ok);
+  showErr(errId, !ok);
+  return ok;
+}
+function validateStep(n) {
+  var ok = true;
+  if (n===1) {
+    if (!reqVal('ev-name','ev-name-err')) ok=false;
+    var cat=document.querySelector('#cat-group .sel');
+    showErr('cat-err',!cat); if(!cat) ok=false;
+    var desc=document.getElementById('ev-desc');
+    var descOk=desc&&desc.value.trim().length>=20;
+    if(desc) desc.classList.toggle('err',!descOk);
+    showErr('ev-desc-err',!descOk); if(!descOk) ok=false;
+  }
+  if (n===2) {
+    if (!reqVal('ev-start','ev-start-err')) ok=false;
+    if (!reqVal('ev-time-s','ev-time-s-err')) ok=false;
+    var isOnline = document.getElementById('online-card').style.display!=='none' &&
+                  document.getElementById('venue-card').style.display==='none';
+    if (!isOnline && !reqVal('ev-venue','ev-venue-err')) ok=false;
+  }
+  if (n===3) {
+    var reg=document.querySelector('#reg-group .sel');
+    showErr('reg-err',!reg); if(!reg) ok=false;
+  }
+  if (n===4) {
+    if (!reqVal('org-name','org-name-err')) ok=false;
+    if (!reqVal('contact-name','contact-name-err')) ok=false;
+    if (!reqVal('contact-tel','contact-tel-err')) ok=false;
+    var email=document.getElementById('contact-email');
+    var emailOk=email&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value);
+    if(email) email.classList.toggle('err',!emailOk);
+    showErr('contact-email-err',!emailOk); if(!emailOk) ok=false;
+  }
+  return ok;
+}
+
+/* ══════════════════════
+   SUBMIT → upload image → write DB
+══════════════════════ */
+function submitForm() {
+  if (!validateStep(4)) {
+    window.scrollTo({top: document.getElementById('fstep4').offsetTop - 80, behavior:'smooth'});
+    return;
+  }
+  try {
+
+  var isFree = document.getElementById('tog-free').classList.contains('sel');
+  var planEl = document.querySelector('.plan-card.sel');
+  var plan = planEl ? planEl.id.replace('plan-','') : 'basic';
+  var tags = [];
+  document.querySelectorAll('#tags-group .sel').forEach(function(el){ tags.push(el.textContent.trim()); });
+  var mode = 'inperson';
+  if (document.getElementById('tog-online').classList.contains('sel')) mode='online';
+  if (document.getElementById('tog-hybrid').classList.contains('sel')) mode='hybrid';
+  var regEl = document.querySelector('#reg-group .sel');
+
+  var evId = 'ev_' + Date.now();
+
+  var ev = {
+    id: evId,
+    name: val('ev-name'),
+    category: (document.querySelector('#cat-group .sel')||{}).textContent||'',
+    tagline: val('ev-tagline'),
+    description: val('ev-desc'),
+    notes: val('ev-notes'),
+    emoji: '🎪',
+    coverImage: '', // will be set after upload
+    color: COLORS[Math.floor(Math.random()*COLORS.length)],
+    mode: mode,
+    dateStart: val('ev-start'),
+    dateEnd: val('ev-end'),
+    timeStart: val('ev-time-s'),
+    timeEnd: val('ev-time-e'),
+    venue: val('ev-venue'),
+    city: val('ev-city'),
+    district: val('ev-district'),
+    address: val('ev-addr'),
+    mapUrl: val('ev-map'),
+    platform: val('ev-platform'),
+    onlineUrl: val('ev-link'),
+    isFree: isFree,
+    ticketName: isFree ? '' : val('ev-ticket-name'),
+    price: isFree ? 0 : (parseInt(val('ev-price'))||0),
+    quota: parseInt(val('ev-quota'))||0,
+    deadline: val('ev-deadline'),
+    regMethod: regEl ? regEl.textContent.trim() : '',
+    regUrl: val('ev-reg-url'),
+    tags: tags,
+    organizer: val('org-name'),
+    contactName: val('contact-name'),
+    contactTel: val('contact-tel'),
+    contactEmail: val('contact-email'),
+    orgWeb: val('org-web'),
+    orgSns: val('org-sns'),
+    plan: plan,
+    status: 'published',
+    createdAt: new Date().toISOString()
+  };
+
+  // Store compressed data URL so cover shows immediately without GitHub upload
+  if (coverFileData && coverFileData.dataUrl) {
+    ev.coverImage = coverFileData.dataUrl;
+  }
+
+  // Save to DB and show success immediately — no waiting for GitHub upload
+  dbInsert(ev);
+  updateAdminBar();
+
+  document.getElementById('fstep4').style.display='none';
+  document.getElementById('success-box').style.display='block';
+
+  var msg = '「' + ev.name + '」已寫入資料庫，目前共有 ' + dbGetAll().length + ' 筆活動。';
+  if (coverFileData && coverFileData.dataUrl) msg += '\n封面圖片已儲存。';
+  document.getElementById('success-desc').textContent = msg;
+  toast('🎉 「' + ev.name + '」已成功上架！');
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  // GitHub upload runs in background — updates coverImage if successful
+  if (coverFileData && getGhToken()) {
+    uploadCoverToGitHub(ev, function(imageUrl) {
+      if (!imageUrl) return;
+      var list = dbGetAll();
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].id === ev.id) { list[i].coverImage = imageUrl; break; }
+      }
+      localStorage.setItem(DB_KEY, JSON.stringify(list, null, 2));
+      toast('📤 封面圖片已同步至 GitHub Pages');
+    });
+  }
+  } catch(e) {
+    alert('送出失敗：' + e.message);
+  }
+}
+
+function val(id) { var el=document.getElementById(id); return el?el.value.trim():''; }
+
+function resetForm() {
+  curStep = 1;
+  for (var i=1;i<=4;i++){
+    var fs=document.getElementById('fstep'+i); if(fs) fs.style.display=i===1?'':'none';
+    var dot=document.getElementById('dot'+i),lbl=document.getElementById('lbl'+i);
+    if(dot){dot.className='step-dot'+(i===1?' active':'');dot.textContent=i;}
+    if(lbl) lbl.className='step-lbl'+(i===1?' active':'');
+  }
+  var sb=document.getElementById('success-box'); if(sb) sb.style.display='none';
+  setMode('inperson'); setFee('free'); selPlan('basic');
+  document.querySelectorAll('#view-form input,#view-form textarea,#view-form select').forEach(function(el){
+    if(el.type!=='radio'&&el.type!=='checkbox') el.value=''; el.classList.remove('err');
+  });
+  document.querySelectorAll('#view-form .pill.sel').forEach(function(el){ el.classList.remove('sel'); });
+  clearCover();
+  document.querySelectorAll('.err-msg').forEach(function(e){ e.style.display='none'; });
+  ['nc','tc','dc'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=el.textContent.replace(/^\d+/,'0'); });
+}
+
+/* ══════════════════════
+   UI HELPERS
+══════════════════════ */
+function countChars(inputId,outId,max){ var v=document.getElementById(inputId).value.length; document.getElementById(outId).textContent=v+' / '+max+' 字'; }
+function selPill(el,groupId){ document.querySelectorAll('#'+groupId+' .pill').forEach(function(p){p.classList.remove('sel');}); el.classList.add('sel'); }
+function togPill(el){ el.classList.toggle('sel'); }
+function setMode(m){
+  ['inperson','online','hybrid'].forEach(function(id){ document.getElementById('tog-'+id).className='toggle-btn'+(id===m?' sel':''); });
+  document.getElementById('venue-card').style.display=m==='online'?'none':'';
+  document.getElementById('online-card').style.display=m==='online'?'':'none';
+}
+function setFee(type){
+  var f=type==='free';
+  document.getElementById('tog-free').className='toggle-btn'+(f?' sel':'');
+  document.getElementById('tog-paid-btn').className='toggle-btn'+(!f?' sel':'');
+  document.getElementById('paid-fields').style.display=f?'none':'';
+}
+function selPlan(p){ ['basic','featured','premium'].forEach(function(id){ document.getElementById('plan-'+id).classList.toggle('sel',id===p); }); }
+
+/* ══════════════════════
+   COVER IMAGE HELPERS
+══════════════════════ */
+var coverFileData = null; // { base64, ext, mimeType }
+
+function onCoverFileChange(e) {
+  var file = e.target.files && e.target.files[0];
+  if (file) loadCoverFile(file);
+}
+function onCoverDrop(e) {
+  e.preventDefault();
+  var file = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadCoverFile(file);
+}
+function loadCoverFile(file) {
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var dataUrl = ev.target.result;
+    // Show preview immediately with original
+    document.getElementById('cover-preview-img').src = dataUrl;
+    document.getElementById('cover-preview-wrap').style.display = '';
+    document.getElementById('cover-upload-zone').style.display = 'none';
+    document.getElementById('cover-filename').textContent = '處理中…';
+
+    // Resize + compress via canvas so the data URL fits in localStorage
+    var img = new Image();
+    img.onload = function() {
+      var MAX_W = 900, MAX_H = 500;
+      var w = img.width, h = img.height;
+      if (w > MAX_W || h > MAX_H) {
+        var ratio = Math.min(MAX_W / w, MAX_H / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      var compressed = canvas.toDataURL('image/jpeg', 0.72);
+      coverFileData = {
+        base64: compressed.split(',')[1],
+        ext: 'jpeg',
+        mimeType: 'image/jpeg',
+        name: file.name,
+        dataUrl: compressed
+      };
+      var kb = Math.round(compressed.length * 0.75 / 1024);
+      document.getElementById('cover-filename').textContent = file.name + ' → ' + w + 'x' + h + ' (' + kb + ' KB)';
+    };
+    img.src = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+function clearCover() {
+  coverFileData = null;
+  document.getElementById('cover-file').value = '';
+  document.getElementById('cover-preview-wrap').style.display = 'none';
+  document.getElementById('cover-upload-zone').style.display = '';
+  document.getElementById('cover-upload-progress').style.display = 'none';
+}
+
+/* ══════════════════════
+   GITHUB TOKEN
+══════════════════════ */
+var GH_TOKEN_KEY = 'gh_token_umoo';
+function saveGhToken() {
+  var t = document.getElementById('gh-token').value.trim();
+  if (!t) { setGhStatus('⚠️ 請輸入 Token', 'warning'); return; }
+  localStorage.setItem(GH_TOKEN_KEY, t);
+  setGhStatus('✅ Token 已儲存', 'ok');
+}
+function getGhToken() { return localStorage.getItem(GH_TOKEN_KEY) || ''; }
+function setGhStatus(msg, type) {
+  var el = document.getElementById('gh-token-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = type === 'ok' ? 'var(--teal)' : type === 'error' ? '#A32D2D' : '#854F0B';
+}
+function setProgress(pct, text) {
+  var bar = document.getElementById('cover-progress-bar');
+  var txt = document.getElementById('cover-progress-text');
+  var wrap = document.getElementById('cover-upload-progress');
+  if (bar) bar.style.width = pct + '%';
+  if (txt) txt.textContent = text;
+  if (wrap) wrap.style.display = pct >= 100 || pct < 0 ? 'none' : '';
+}
+
+/* ══════════════════════
+   GITHUB IMAGE UPLOAD
+══════════════════════ */
+var GH_OWNER = 'umoo125';
+var GH_REPO  = 'umoo';
+var GH_BRANCH = 'main';
+var GH_IMG_PATH = 'events'; // subfolder inside repo
+
+function uploadCoverToGitHub(ev, callback) {
+  if (!coverFileData) {
+    callback(null, null); // no file — skip upload, not an error
+    return;
+  }
+  var token = getGhToken();
+  if (!token) {
+    callback(null, 'GitHub Token 未設定，請先填寫 Token');
+    return;
+  }
+
+  var filename = ev.id + '.' + coverFileData.ext;
+  var filePath = GH_IMG_PATH + '/' + filename;
+  var apiUrl = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + filePath;
+  var publicUrl = 'https://' + GH_OWNER + '.github.io/' + GH_REPO + '/' + filePath;
+
+  setProgress(20, '連線至 GitHub…');
+
+  // Check if file already exists (to get SHA for update)
+  fetch(apiUrl, {
+    headers: {
+      'Authorization': 'token ' + token,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  })
+  .then(function(res) {
+    return res.status === 200 ? res.json() : null;
+  })
+  .then(function(existing) {
+    setProgress(50, '上傳圖片中…');
+    var body = {
+      message: 'Upload event cover: ' + filename,
+      content: coverFileData.base64,
+      branch: GH_BRANCH
+    };
+    if (existing && existing.sha) body.sha = existing.sha; // update existing file
+
+    return fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + token,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+  })
+  .then(function(res) {
+    setProgress(90, '確認上傳…');
+    if (!res.ok) {
+      return res.json().then(function(e){ throw new Error(e.message || 'HTTP ' + res.status); });
+    }
+    return res.json();
+  })
+  .then(function() {
+    setProgress(100, '上傳完成！');
+    setTimeout(function(){ setProgress(-1, ''); }, 1200);
+    callback(publicUrl, null);
+  })
+  .catch(function(err) {
+    setProgress(-1, '');
+    var msg = err && err.message ? err.message : String(err);
+    // Common error hints
+    if (msg.includes('401') || msg.includes('Bad credentials')) msg = 'Token 無效或過期，請重新設定';
+    else if (msg.includes('404')) msg = 'Repo 不存在或 Token 無權限（需要 repo 權限）';
+    else if (msg.includes('422')) msg = '檔案路徑格式錯誤';
+    callback(null, msg);
+  });
+}
+
+/* ══════════════════════
+   SEED DATA (first run)
+══════════════════════ */
+function seedData() {
+  var seed = [
+    {id:'ev_s1',name:'2025 台北當代藝術博覽會',category:'展覽',tagline:'亞太百家畫廊齊聚台北',description:'匯聚亞太地區百家頂尖畫廊，超過1,200件當代藝術作品，帶你進入多元藝術對話的世界。開幕首日有特別藝術家見面會。',notes:'',emoji:'🎨',color:'coral-light',mode:'inperson',dateStart:'2025-05-17',dateEnd:'2025-05-20',timeStart:'10:00',timeEnd:'18:00',venue:'台北世貿一館',city:'台北市',district:'信義區',address:'信義路五段5號',mapUrl:'',platform:'',onlineUrl:'',isFree:false,ticketName:'一般票',price:300,quota:0,deadline:'2025-05-16',regMethod:'本站報名',regUrl:'',tags:['藝術','設計'],organizer:'台北藝術週基金會',contactName:'陳小姐',contactTel:'02-2345-6789',contactEmail:'info@artweek.tw',orgWeb:'',orgSns:'',plan:'featured',status:'published',createdAt:'2025-04-01T08:00:00.000Z'},
+    {id:'ev_s2',name:'夏日音樂節 Summer Vibes',category:'音樂演出',tagline:'今夏最熱血的戶外音樂盛典',description:'超過20組樂團輪番上陣，在大安森林公園享受一整天的音樂饗宴。帶上野餐墊，和朋友一起感受夏日最美好的時光。',notes:'建議穿著舒適，自備防曬用品',emoji:'🎵',color:'teal-light',mode:'inperson',dateStart:'2025-06-08',dateEnd:'2025-06-08',timeStart:'14:00',timeEnd:'22:00',venue:'大安森林公園',city:'台北市',district:'大安區',address:'',mapUrl:'',platform:'',onlineUrl:'',isFree:false,ticketName:'一般票',price:800,quota:500,deadline:'2025-06-01',regMethod:'外部連結',regUrl:'',tags:['音樂','戶外'],organizer:'Summer Vibes 主辦團隊',contactName:'林先生',contactTel:'0912-345-678',contactEmail:'hello@summervibes.tw',orgWeb:'',orgSns:'@summervibestw',plan:'featured',status:'published',createdAt:'2025-04-05T09:00:00.000Z'},
+    {id:'ev_s3',name:'AI 應用實戰工作坊',category:'工作坊',tagline:'從零到一打造你的 AI 工作流',description:'本工作坊帶你實際操作 ChatGPT、Claude、Midjourney 等 AI 工具，學習如何整合到日常工作中提升效率。不需要程式背景，人人都可以上手。',notes:'請自備電腦',emoji:'💻',color:'blue-light',mode:'online',dateStart:'2025-05-25',dateEnd:'2025-05-25',timeStart:'14:00',timeEnd:'17:00',venue:'',city:'',district:'',address:'',mapUrl:'',platform:'Zoom',onlineUrl:'https://zoom.us/j/example',isFree:true,ticketName:'',price:0,quota:100,deadline:'2025-05-23',regMethod:'本站報名',regUrl:'',tags:['科技','教育'],organizer:'AI 學習社群',contactName:'王大明',contactTel:'0987-654-321',contactEmail:'ai@example.com',orgWeb:'',orgSns:'',plan:'basic',status:'published',createdAt:'2025-04-10T10:00:00.000Z'},
+    {id:'ev_s4',name:'2025 台灣美食嘉年華',category:'美食市集',tagline:'100+ 攤位，一次吃遍台灣味',description:'全台最大美食市集活動，聚集來自全台各地的特色小吃、甜點、飲品攤位，還有現場廚藝示範和評鑑賽。',notes:'寵物友善，嬰兒車可入場',emoji:'🍜',color:'purple-light',mode:'inperson',dateStart:'2025-05-30',dateEnd:'2025-06-02',timeStart:'10:00',timeEnd:'21:00',venue:'南港展覽館',city:'台北市',district:'南港區',address:'',mapUrl:'',platform:'',onlineUrl:'',isFree:true,ticketName:'',price:0,quota:0,deadline:'',regMethod:'現場報名',regUrl:'',tags:['美食'],organizer:'台灣觀光協會',contactName:'公關部',contactTel:'02-2789-0000',contactEmail:'pr@taiwan-food.org',orgWeb:'',orgSns:'',plan:'basic',status:'published',createdAt:'2025-04-12T11:00:00.000Z'},
+    {id:'ev_s5',name:'永續生活工作坊系列',category:'工作坊',tagline:'從生活小事開始改變地球',description:'每個月一場的永續主題工作坊，本月主題為「無塑生活」。學習如何減少一次性塑膠使用，製作天然清潔用品，帶回一套永續生活工具包。',notes:'名額有限，請提前報名',emoji:'🌱',color:'green-light',mode:'inperson',dateStart:'2025-06-01',dateEnd:'2025-06-01',timeStart:'13:00',timeEnd:'16:00',venue:'松菸誠品',city:'台北市',district:'信義區',address:'光復南路133號',mapUrl:'',platform:'',onlineUrl:'',isFree:false,ticketName:'一般票',price:500,quota:20,deadline:'2025-05-28',regMethod:'Email 報名',regUrl:'',tags:['永續','健康'],organizer:'綠色生活協會',contactName:'李小姐',contactTel:'02-2765-4321',contactEmail:'green@example.com',orgWeb:'',orgSns:'',plan:'basic',status:'published',createdAt:'2025-04-15T14:00:00.000Z'},
+    {id:'ev_s6',name:'未來教育論壇 2025',category:'講座',tagline:'重新定義下一代的學習方式',description:'匯聚教育部官員、頂尖教育學者與科技業者共同探討 AI 時代的教育轉型。議題涵蓋個人化學習、素養教育、師資培訓等面向。',notes:'提供英文即時口譯',emoji:'📚',color:'amber-light',mode:'inperson',dateStart:'2025-06-14',dateEnd:'2025-06-14',timeStart:'09:00',timeEnd:'17:00',venue:'台大醫院國際會議廳',city:'台北市',district:'中正區',address:'常德街1號',mapUrl:'',platform:'',onlineUrl:'',isFree:false,ticketName:'一般票',price:1200,quota:200,deadline:'2025-06-08',regMethod:'外部連結',regUrl:'',tags:['教育','商業'],organizer:'未來學習基金會',contactName:'秘書室',contactTel:'02-3366-0000',contactEmail:'forum@futurelearning.org',orgWeb:'',orgSns:'',plan:'basic',status:'published',createdAt:'2025-04-20T08:00:00.000Z'}
+  ];
+  localStorage.setItem(DB_KEY, JSON.stringify(seed, null, 2));
+}
+
+/* ══════════════════════
+   INIT
+══════════════════════ */
+window.addEventListener('DOMContentLoaded', function(){
+  if (!localStorage.getItem(DB_KEY)) seedData();
+  renderHome();
+  updateAdminBar();
+});
+</script>
+</body>
+</html>
