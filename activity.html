@@ -1075,7 +1075,7 @@ function shareEvent() {
   var base = '【' + currentEvent.name + '】' + (currentEvent.tagline ? ' ' + currentEvent.tagline : '') +
              '\n📅 ' + (currentEvent.dateStart||'').replace(/-/g,'/') +
              (currentEvent.city ? '\n📍 ' + currentEvent.city : '') +
-             '\n\n活動廣場 activitysquare.tw';
+             '\n\n— 活動廣場';
   if (navigator.share) {
     navigator.share({title: currentEvent.name, text: base + '\n' + siteUrl}).catch(function(){});
   } else if (navigator.clipboard) {
