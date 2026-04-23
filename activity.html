@@ -1076,12 +1076,11 @@ function shareEvent() {
              '\n📅 ' + (currentEvent.dateStart||'').replace(/-/g,'/') +
              (currentEvent.city ? '\n📍 ' + currentEvent.city : '') +
              '\n\n— 活動廣場';
-  if (navigator.share) {
-    navigator.share({title: currentEvent.name, text: base + '\n' + siteUrl}).catch(function(){});
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(base + '\n' + siteUrl).then(function(){ toast('✅ 活動資訊已複製到剪貼簿'); });
+  var full = base + '\n' + siteUrl;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(full).then(function(){ toast('✅ 已複製，請直接貼上分享'); });
   } else {
-    toast('✅ 複製活動資訊：' + currentEvent.name);
+    prompt('複製以下文字後分享：', full);
   }
 }
 
