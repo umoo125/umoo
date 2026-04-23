@@ -418,7 +418,7 @@
   <div style="max-width:960px;margin:0 auto;padding:28px 20px 56px">
     <button class="back-btn" onclick="showView('home')">← 返回首頁</button>
     <div class="page-title" style="margin-bottom:4px">🗄 JSON 資料庫</div>
-    <p style="font-size:13px;color:var(--text-2);margin-bottom:20px">活動資料以 JSON 格式儲存在瀏覽器 <code style="background:var(--bg);padding:2px 6px;border-radius:4px">localStorage</code>，key 為 <code style="background:var(--bg);padding:2px 6px;border-radius:4px">activityDB</code>。可匯出為 .json 檔案整合至後端系統。</p>
+    <p style="font-size:13px;color:var(--text-2);margin-bottom:20px">活動資料以 <code style="background:var(--bg);padding:2px 6px;border-radius:4px">activities.json</code> 為主要來源，每次載入頁面時自動讀取並同步至瀏覽器快取。新增的活動即時寫入快取；匯出後覆蓋 <code style="background:var(--bg);padding:2px 6px;border-radius:4px">activities.json</code> 即可持久保存。</p>
 
     <div class="form-card" style="margin-bottom:16px">
       <div class="json-toolbar">
@@ -817,7 +817,7 @@
 
 <script>
 /* ══════════════════════
-   DATABASE (localStorage)
+   DATABASE (activities.json → localStorage)
 ══════════════════════ */
 var DB_KEY = 'activityDB';
 var COLORS = ['coral-light','teal-light','blue-light','purple-light','green-light','amber-light','red-light'];
@@ -1611,9 +1611,20 @@ function seedData() {
    INIT
 ══════════════════════ */
 window.addEventListener('DOMContentLoaded', function(){
-  if (!localStorage.getItem(DB_KEY)) seedData();
-  renderHome();
-  updateAdminBar();
+  fetch('activities.json?_=' + Date.now())
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (Array.isArray(data)) {
+        localStorage.setItem(DB_KEY, JSON.stringify(data, null, 2));
+      }
+      renderHome();
+      updateAdminBar();
+    })
+    .catch(function() {
+      if (!localStorage.getItem(DB_KEY)) seedData();
+      renderHome();
+      updateAdminBar();
+    });
 });
 </script>
 </body>
