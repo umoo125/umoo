@@ -425,6 +425,7 @@
         <span id="json-meta">載入中…</span>
         <button class="btn-ghost" onclick="refreshJSON()" style="font-size:12px;padding:5px 12px">🔄 重新整理</button>
         <button class="btn-ghost" onclick="exportJSON()" style="font-size:12px;padding:5px 12px">⬇ 匯出 .json</button>
+        <button class="btn-ghost" id="btn-sync-json" onclick="pushToActivitiesJson()" style="font-size:12px;padding:5px 12px">☁ 同步至 activities.json</button>
         <button class="btn-primary" onclick="showView('form')" style="font-size:12px;padding:6px 14px">＋ 新增活動</button>
       </div>
       <div class="json-viewer" id="json-viewer">載入中…</div>
@@ -865,6 +866,19 @@ function clearDB() {
   if (!confirm('確定清除所有活動資料？此動作無法復原。')) return;
   dbClear(); toast('🗑 資料庫已清除');
   renderHome(); updateAdminBar();
+}
+function pushToActivitiesJson() {
+  if (!getGhToken()) {
+    toast('⚠️ 請先設定 GitHub Token 才能同步');
+    return;
+  }
+  var btn = document.getElementById('btn-sync-json');
+  if (btn) { btn.disabled = true; btn.textContent = '☁ 同步中…'; }
+  syncActivitiesToGitHub(function(ok, err) {
+    if (ok) toast('✅ activities.json 已同步至 GitHub（' + dbGetAll().length + ' 筆）');
+    else toast('❌ 同步失敗：' + (err || '未知錯誤'));
+    if (btn) { btn.disabled = false; btn.textContent = '☁ 同步至 activities.json'; }
+  });
 }
 
 /* ══════════════════════
