@@ -1077,7 +1077,7 @@ function shareEvent() {
              (currentEvent.city ? '\n📍 ' + currentEvent.city : '') +
              '\n\n活動廣場 activitysquare.tw';
   if (navigator.share) {
-    navigator.share({title: currentEvent.name, text: base, url: siteUrl}).catch(function(){});
+    navigator.share({title: currentEvent.name, text: base + '\n' + siteUrl}).catch(function(){});
   } else if (navigator.clipboard) {
     navigator.clipboard.writeText(base + '\n' + siteUrl).then(function(){ toast('✅ 活動資訊已複製到剪貼簿'); });
   } else {
