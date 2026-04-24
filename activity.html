@@ -243,7 +243,7 @@
   <button onclick="showView('json')">查看 JSON</button>
   <button onclick="exportJSON()">匯出 JSON</button>
   <button onclick="importJSON()">匯入 JSON</button>
-  <button class="danger" onclick="clearDB()">清除資料</button>
+  <button class="danger" onclick="clearExpiredActivities()">清除過期活動</button>
   <button class="danger" onclick="cleanOrphanCovers()">清除不在的封圖</button>
 </div>
 
@@ -875,6 +875,77 @@ function clearDB() {
   if (!confirm('確定清除所有活動資料？此動作無法復原。')) return;
   dbClear(); toast('🗑 資料庫已清除');
   renderHome(); updateAdminBar();
+}
+function clearExpiredActivities() {
+  var today = new Date().toISOString().slice(0, 10);
+  var all = dbGetAll();
+  var expired = all.filter(function(ev) {
+    var end = ev.dateEnd || ev.dateStart || '';
+    return end && end < today;
+  });
+  if (!expired.length) { toast('✅ 沒有過期的活動'); return; }
+  if (!confirm('找到 ' + expired.length + ' 筆過期活動，確定清除？\n' +
+               expired.map(function(ev){ return '・' + ev.name + '（' + (ev.dateEnd||ev.dateStart) + '）'; }).join('\n'))) return;
+
+  // Remove expired from DB
+  var remaining = all.filter(function(ev) {
+    var end = ev.dateEnd || ev.dateStart || '';
+    return !end || end >= today;
+  });
+  localStorage.setItem(DB_KEY, JSON.stringify(remaining, null, 2));
+  renderHome(); updateAdminBar();
+  toast('🗑 已清除 ' + expired.length + ' 筆過期活動');
+
+  // Delete cover images from GitHub
+  var token = getGhToken();
+  if (!token) {
+    syncActivitiesToGitHub(function(ok, err) {
+      if (!ok) toast('⚠️ activities.json 同步失敗：' + err);
+    });
+    return;
+  }
+  var apiBase = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO;
+  var headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' };
+  var toDelete = expired.filter(function(ev) {
+    return ev.coverImage && ev.coverImage.indexOf(GH_OWNER + '.github.io') !== -1;
+  });
+
+  function syncAfter() {
+    syncActivitiesToGitHub(function(ok, err) {
+      if (ok) toast('📋 activities.json 已更新');
+      else toast('⚠️ activities.json 同步失敗：' + err);
+    });
+  }
+
+  if (!toDelete.length) { syncAfter(); return; }
+
+  var done = 0, failed = 0;
+  toDelete.forEach(function(ev) {
+    var parts = ev.coverImage.split('/');
+    var filename = parts[parts.length - 1];
+    var filePath = GH_IMG_PATH + '/' + filename;
+    var apiUrl = apiBase + '/contents/' + filePath;
+    fetch(apiUrl, { headers: headers })
+      .then(function(res) { return res.status === 200 ? res.json() : null; })
+      .then(function(existing) {
+        if (!existing || !existing.sha) { done++; check(); return; }
+        return fetch(apiUrl, {
+          method: 'DELETE',
+          headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ message: 'Remove expired cover: ' + filename, sha: existing.sha, branch: GH_BRANCH })
+        }).then(function(res) {
+          if (res.ok) done++; else failed++;
+          check();
+        });
+      })
+      .catch(function() { failed++; check(); });
+  });
+
+  function check() {
+    if (done + failed < toDelete.length) return;
+    toast('🗑 已刪除 ' + done + ' 張封面圖片' + (failed ? '，' + failed + ' 張失敗' : ''));
+    syncAfter();
+  }
 }
 function cleanOrphanCovers() {
   var token = getGhToken();
