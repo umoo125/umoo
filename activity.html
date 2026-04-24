@@ -1414,22 +1414,7 @@ function submitForm() {
   toast('🎉 「' + ev.name + '」已成功上架！');
   window.scrollTo({top:0,behavior:'smooth'});
 
-  // GitHub upload runs in background — updates coverImage if successful
-  if (coverFileData && getGhToken()) {
-    uploadCoverToGitHub(ev, function(imageUrl) {
-      if (!imageUrl) return;
-      var list = dbGetAll();
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].id === ev.id) { list[i].coverImage = imageUrl; break; }
-      }
-      localStorage.setItem(DB_KEY, JSON.stringify(list, null, 2));
-      toast('📤 封面圖片已同步至 GitHub Pages');
-      syncActivitiesToGitHub(function(ok, err) {
-        if (ok) { descEl.textContent = baseMsg + '\n✅ activities.json 已同步至 GitHub。'; toast('📋 activities.json 已更新'); }
-        else toast('⚠️ activities.json 同步失敗：' + err);
-      });
-    });
-  } else if (getGhToken()) {
+  if (getGhToken()) {
     syncActivitiesToGitHub(function(ok, err) {
       if (ok) { descEl.textContent = baseMsg + '\n✅ activities.json 已同步至 GitHub。'; toast('📋 activities.json 已更新'); }
       else { descEl.textContent = baseMsg + '\n⚠️ activities.json 同步失敗：' + err; }
