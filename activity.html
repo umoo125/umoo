@@ -1396,12 +1396,7 @@ function submitForm() {
     createdAt: new Date().toISOString()
   };
 
-  // Store compressed data URL so cover shows immediately without GitHub upload
-  if (coverFileData && coverFileData.dataUrl) {
-    ev.coverImage = coverFileData.dataUrl;
-  }
-
-  // Save to DB and show success immediately — no waiting for GitHub upload
+  // coverImage starts empty; only set after GitHub upload succeeds (stores public URL, not Data URL)
   dbInsert(ev);
   updateAdminBar();
 
@@ -1410,11 +1405,31 @@ function submitForm() {
 
   var descEl = document.getElementById('success-desc');
   var baseMsg = '「' + ev.name + '」已新增，目前共有 ' + dbGetAll().length + ' 筆活動。';
-  descEl.textContent = baseMsg + (getGhToken() ? '\nactivities.json 同步中…' : '\n尚未設定 GitHub Token，資料僅存於本機快取。');
+  descEl.textContent = baseMsg + (getGhToken() ? '\n封面圖片上傳中…' : '\n尚未設定 GitHub Token，封面圖片不會上傳。');
   toast('🎉 「' + ev.name + '」已成功上架！');
   window.scrollTo({top:0,behavior:'smooth'});
 
-  if (getGhToken()) {
+  if (coverFileData && getGhToken()) {
+    uploadCoverToGitHub(ev, function(imageUrl) {
+      if (!imageUrl) {
+        syncActivitiesToGitHub(function(ok, err) {
+          if (ok) { descEl.textContent = baseMsg + '\n✅ activities.json 已同步至 GitHub。'; }
+          else { descEl.textContent = baseMsg + '\n⚠️ activities.json 同步失敗：' + err; }
+        });
+        return;
+      }
+      var list = dbGetAll();
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].id === ev.id) { list[i].coverImage = imageUrl; break; }
+      }
+      localStorage.setItem(DB_KEY, JSON.stringify(list, null, 2));
+      toast('📤 封面圖片已上傳：' + imageUrl);
+      syncActivitiesToGitHub(function(ok, err) {
+        if (ok) { descEl.textContent = baseMsg + '\n✅ 封面圖片與 activities.json 已同步至 GitHub。'; toast('📋 activities.json 已更新'); }
+        else { descEl.textContent = baseMsg + '\n⚠️ activities.json 同步失敗：' + err; }
+      });
+    });
+  } else if (getGhToken()) {
     syncActivitiesToGitHub(function(ok, err) {
       if (ok) { descEl.textContent = baseMsg + '\n✅ activities.json 已同步至 GitHub。'; toast('📋 activities.json 已更新'); }
       else { descEl.textContent = baseMsg + '\n⚠️ activities.json 同步失敗：' + err; }
