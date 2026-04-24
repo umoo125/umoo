@@ -251,7 +251,7 @@
   <div class="logo" onclick="showView('home')">活動<span>廣場</span></div>
   <nav class="header-nav">
     <button class="btn-ghost" onclick="showView('home')">首頁</button>
-    <button class="btn-ghost" onclick="showView('json')">📊 資料庫</button>
+    <button class="btn-ghost" onclick="showView('json')">📊</button>
     <button class="btn-primary" onclick="showView('form')">＋ 刊登活動</button>
   </nav>
 </header>
@@ -1063,7 +1063,28 @@ function handleReg() {
   if (currentEvent.regUrl) {
     window.open(currentEvent.regUrl, '_blank');
   } else if (currentEvent.contactEmail) {
-    window.location.href = 'mailto:' + currentEvent.contactEmail + '?subject=活動報名：' + encodeURIComponent(currentEvent.name);
+    var e = currentEvent;
+    var dateRange = e.dateStart ? e.dateStart.replace(/-/g,'/') + (e.dateEnd && e.dateEnd !== e.dateStart ? ' ~ ' + e.dateEnd.replace(/-/g,'/') : '') : '';
+    var body =
+      '您好，我想報名以下活動：\n' +
+      '\n' +
+      '【活動資訊】\n' +
+      '活動名稱：' + e.name + '\n' +
+      (dateRange ? '活動日期：' + dateRange + '\n' : '') +
+      (e.venue   ? '活動地點：' + e.venue + '\n' : '') +
+      '\n' +
+      '【報名資料】\n' +
+      '連絡人姓名：\n' +
+      '聯絡電話：\n' +
+      '電子信箱：\n' +
+      '參加人數：\n' +
+      (e.isFree ? '' : '票種 / 數量：\n') +
+      '備註事項：\n' +
+      '\n' +
+      '請填寫後回覆，謝謝！';
+    window.location.href = 'mailto:' + e.contactEmail +
+      '?subject=' + encodeURIComponent('活動報名：' + e.name) +
+      '&body=' + encodeURIComponent(body);
   } else {
     toast('📝 請聯絡主辦方報名：' + (currentEvent.contactTel || currentEvent.contactEmail || '詳見聯絡資訊'));
   }
