@@ -244,6 +244,7 @@
   <button onclick="exportJSON()">匯出 JSON</button>
   <button onclick="importJSON()">匯入 JSON</button>
   <button class="danger" onclick="clearDB()">清除資料</button>
+  <button class="danger" onclick="cleanOrphanCovers()">清除不在的封圖</button>
 </div>
 
 <!-- HEADER -->
@@ -874,6 +875,64 @@ function clearDB() {
   if (!confirm('確定清除所有活動資料？此動作無法復原。')) return;
   dbClear(); toast('🗑 資料庫已清除');
   renderHome(); updateAdminBar();
+}
+function cleanOrphanCovers() {
+  var token = getGhToken();
+  if (!token) { toast('⚠️ 請先設定 GitHub Token'); return; }
+
+  // Collect all coverImage filenames referenced in DB
+  var used = {};
+  dbGetAll().forEach(function(ev) {
+    if (ev.coverImage && ev.coverImage.indexOf(GH_OWNER + '.github.io') !== -1) {
+      var parts = ev.coverImage.split('/');
+      used[parts[parts.length - 1]] = true;
+    }
+  });
+
+  var apiBase = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO;
+  var headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' };
+
+  toast('🔍 掃描 events/ 資料夾…');
+  fetch(apiBase + '/contents/' + GH_IMG_PATH + '?ref=' + GH_BRANCH, { headers: headers })
+    .then(function(res) {
+      if (!res.ok) return res.json().then(function(e) { throw new Error(e.message || 'HTTP ' + res.status); });
+      return res.json();
+    })
+    .then(function(files) {
+      var orphans = files.filter(function(f) { return f.type === 'file' && !used[f.name]; });
+      if (!orphans.length) { toast('✅ 沒有孤立封面圖片'); return; }
+      if (!confirm('找到 ' + orphans.length + ' 張未使用的封面圖片，確定刪除？\n' +
+                   orphans.map(function(f){ return f.name; }).join('\n'))) return;
+
+      var done = 0, failed = 0;
+      orphans.forEach(function(f) {
+        fetch(apiBase + '/contents/' + f.path, {
+          method: 'DELETE',
+          headers: Object.assign({}, headers, { 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ message: 'Remove orphan cover: ' + f.name, sha: f.sha, branch: GH_BRANCH })
+        })
+        .then(function(res) {
+          if (res.ok) done++; else failed++;
+          if (done + failed === orphans.length) {
+            toast('🗑 已刪除 ' + done + ' 張孤立封面' + (failed ? '，' + failed + ' 張失敗' : ''));
+          }
+        })
+        .catch(function() {
+          failed++;
+          if (done + failed === orphans.length) {
+            toast('🗑 已刪除 ' + done + ' 張孤立封面，' + failed + ' 張失敗');
+          }
+        });
+      });
+    })
+    .catch(function(err) {
+      var msg = err && err.message ? err.message : String(err);
+      if (msg.indexOf('Bad credentials') !== -1 || msg.indexOf('401') !== -1)
+        msg = 'Token 無效或已過期，請至封面圖片設定區重新輸入並儲存';
+      else if (msg.indexOf('Not Found') !== -1 || msg.indexOf('404') !== -1)
+        msg = 'events/ 資料夾不存在或 Token 缺少 repo 權限';
+      toast('❌ 掃描失敗：' + msg);
+    });
 }
 function pushToActivitiesJson() {
   if (!getGhToken()) {
